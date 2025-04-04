@@ -1,0 +1,19 @@
+maintenance: true
+maintenance-message: "[ADMIN] FIX CONFIGURATION"
+
+selected_server: "sample_world_1"
+
+allowlist:
+  - "0c5390b1-a7cd-4fe0-8309-baf977a9ed20"
+  - "DEFG"
+  - "HIJK"
+
+servers:
+  sample_world_1:
+    display_name: "Sample World 1"
+    ptero_server_id: "abcdef"
+    auto_start: false
+  sample_world_2:
+    display_name: "Sample World 2"
+    ptero_server_id: "abcdef"
+    auto_start: false
