@@ -1,3 +1,7 @@
+ptero_api_key: "ABCDEF"
+ptero_panel_url: "https://example.com"
+aws_instance_id: "fds"
+
 maintenance: true
 maintenance-message: "[ADMIN] FIX CONFIGURATION"
 

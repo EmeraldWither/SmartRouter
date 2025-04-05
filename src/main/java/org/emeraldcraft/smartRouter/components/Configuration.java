@@ -1,11 +1,12 @@
 package org.emeraldcraft.smartRouter.components;
 
 import org.emeraldcraft.smartRouter.SmartRouter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
+import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.ec2.Ec2Client;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -16,21 +17,22 @@ import java.util.Objects;
 
 public class Configuration {
     private final Path path;
-    private final Logger logger;
 
     private boolean maintenance = true;
     private String maintenanceMessage = "Wrong Configuration. Contact Admin.";
     private final List<ChildServer> configuredChildServers = new ArrayList<>();
     private ChildServer selectedServer;
+    private String pteroPanelURL;
+    private String pteroAPIKey;
+    private Ec2Client ec2Client;
     private final List<String> allowList = new ArrayList<>();
 
-    public Configuration(Path path, SmartRouter smartRouter) {
+    public Configuration(Path path) {
         this.path = path;
-        this.logger = smartRouter.getLogger();
     }
 
     public void load() throws ConfigurateException {
-        logger.info("Configuration File Path: {}", path.resolve("config.yml").toAbsolutePath());
+        SmartRouter.getLogger().info("Configuration File Path: {}", path.resolve("config.yml").toAbsolutePath());
         createFileIfNotFound();
         final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
                 .path(path.resolve("config.yml"))
@@ -46,7 +48,8 @@ public class Configuration {
             String displayName = node.node("display_name").getString();
             String pteroServerId = node.node("ptero_server_id").getString();
             boolean autoStart = node.node("auto_start").getBoolean();
-            ChildServer childServer = new ChildServer(serverName.toString(), Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), autoStart);
+            String awsInstanceId = root.node("aws_instance_id").getString();
+            ChildServer childServer = new ChildServer(serverName.toString(), Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), Objects.requireNonNull(awsInstanceId), autoStart);
             configuredChildServers.add(childServer);
         });
 
@@ -68,12 +71,20 @@ public class Configuration {
             }
         }
         if(!found) {
-            logger.error("Unable to find selected server %s in configuration");
+            SmartRouter.getLogger().error("Unable to find selected server %s in configuration");
             throw new IllegalArgumentException("Selected server %s not found in configuration".formatted(selectedServer));
         }
-        logger.info("Successfully loaded configuration");
 
-        logger.info("""
+        //grab the ptero panel url
+        pteroPanelURL = root.node("ptero_panel_url").getString();
+        pteroAPIKey = root.node("ptero_api_key").getString();
+
+        this.ec2Client = Ec2Client.builder().credentialsProvider(InstanceProfileCredentialsProvider.builder().build()).region(Region.US_EAST_2).build();
+        this.ec2Client.describeInstanceStatus();
+
+        SmartRouter.getLogger().info("Successfully loaded configuration");
+
+        SmartRouter.getLogger().info("""
                 Configuration Information
                 
                 Maintenance: %s
@@ -90,8 +101,15 @@ public class Configuration {
                         allowList.stream().map(String::toString).toList()
                 )
         );
+    }
 
-
+    public ChildServer childServerFromName(String serverName) {
+        for (ChildServer childServer : configuredChildServers) {
+            if (childServer.configName().equals(serverName)) {
+                return childServer;
+            }
+        }
+        throw new IllegalArgumentException("Cannot find server with name %s".formatted(serverName));
     }
 
     private void createFileIfNotFound() {
@@ -99,17 +117,20 @@ public class Configuration {
         if (file.exists()) {
             return;
         }
-        logger.warn("Configuration file not found. Creating a new one.");
+        SmartRouter.getLogger().warn("Configuration file not found. Creating a new one.");
         //grab the file from our jar file
         InputStream is = SmartRouter.class.getResourceAsStream("/config.yml");
         try {
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                SmartRouter.getLogger().warn("A configuration file already exists!!!");
+                return;
+            }
             Files.copy(Objects.requireNonNull(is), Path.of(file.getAbsolutePath()), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             is.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        logger.warn("Configuration file created. Please edit the file ASAP!!!");
+        SmartRouter.getLogger().warn("Configuration file created. Please edit the file ASAP!!!");
     }
 
     public boolean isMaintenance() {
@@ -130,5 +151,17 @@ public class Configuration {
 
     public List<String> getAllowList() {
         return allowList;
+    }
+
+    public String getPteroPanelURL() {
+        return pteroPanelURL;
+    }
+
+    public String getPteroAPIKey() {
+        return pteroAPIKey;
+    }
+
+    public Ec2Client getEc2Client() {
+        return ec2Client;
     }
 }

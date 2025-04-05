@@ -10,8 +10,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.emeraldcraft.smartRouter.SmartRouter;
+import org.emeraldcraft.smartRouter.components.ChildServer;
+import org.emeraldcraft.smartRouter.components.Configuration;
+import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
 
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class PlayerLoginEvents {
     private final SmartRouter smartRouter;
@@ -25,14 +29,13 @@ public class PlayerLoginEvents {
         if (smartRouter.getConfiguration().isMaintenance()) {
             PreLoginEvent.PreLoginComponentResult denied = PreLoginEvent.PreLoginComponentResult.denied(Component.text(smartRouter.getConfiguration().getMaintenanceMessage()).color(NamedTextColor.RED));
             event.setResult(denied);
-            smartRouter.getLogger().info("[prelogin] Player %s attempted to join during maintenance mode.".formatted(event.getUsername()));
+            SmartRouter.getLogger().info("[prelogin] Player %s attempted to join during maintenance mode.".formatted(event.getUsername()));
             return;
         }
         if (!smartRouter.getConfiguration().getAllowList().contains(event.getUniqueId().toString())) {
             PreLoginEvent.PreLoginComponentResult denied = PreLoginEvent.PreLoginComponentResult.denied(Component.text("You are not whitelisted to be part of the network.").color(NamedTextColor.RED));
             event.setResult(denied);
-            smartRouter.getLogger().warn("[prelogin] Player %s (UUID %s) attempted to join but is not on the allowlist.".formatted(event.getUsername(), event.getUniqueId()));
-            return;
+            SmartRouter.getLogger().warn("[prelogin] Player %s (UUID %s) attempted to join but is not on the allowlist.".formatted(event.getUsername(), event.getUniqueId()));
         }
     }
     @Subscribe
@@ -50,7 +53,7 @@ public class PlayerLoginEvents {
             ResultedEvent.ComponentResult denied = LoginEvent.ComponentResult.denied(Component.text("You are not whitelisted to be part of the network.").color(NamedTextColor.RED));
             event.getPlayer().disconnect(denied.getReasonComponent().get());
             event.setResult(denied);
-            smartRouter.getLogger().warn("[login] Player %s (UUID %s) attempted to join but is not on the allowlist.".formatted(event.getPlayer().getUsername(), event.getPlayer().getUniqueId().toString()));
+            SmartRouter.getLogger().warn("[login] Player %s (UUID %s) attempted to join but is not on the allowlist.".formatted(event.getPlayer().getUsername(), event.getPlayer().getUniqueId().toString()));
             return;
         }
 
@@ -59,14 +62,39 @@ public class PlayerLoginEvents {
     }
     @Subscribe
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
-        Optional<RegisteredServer> server = smartRouter.getProxyServer().getServer(smartRouter.getConfiguration().getSelectedServer().configName());
+        Configuration configuration = smartRouter.getConfiguration();
+        ChildServer selectedServer = configuration.getSelectedServer();
+        Optional<RegisteredServer> server = SmartRouter.getProxyServer().getServer(selectedServer.configName());
         if(server.isPresent()) {
+            //check for instance state, or start server
+
+            String state = Pterodactyl.getServerState(selectedServer, configuration);
+            if (state.equalsIgnoreCase("stopped")) {
+                Pterodactyl.startServer(selectedServer, configuration);
+                SmartRouter.getLogger().info("Starting the server %s!".formatted(selectedServer.displayName()));
+                event.getPlayer().disconnect(Component.text("You have started the server %s".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN));
+                return;
+            }
+            if (state.equalsIgnoreCase("starting")) {
+                event.getPlayer().disconnect(Component.text("The server %s is still starting.".formatted(selectedServer.displayName())).color(NamedTextColor.GOLD));
+                return;
+            }
+
+            if (state.equalsIgnoreCase("stopping")) {
+                SmartRouter.getLogger().info("Server is stopping. Cannot run any actions.");
+                event.getPlayer().disconnect(Component.text("The server %s is stopping, and cannot have actions run on it. Try again in a bit...".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
+                return;
+            }
+
+
             event.setInitialServer(server.get());
-            event.getPlayer().sendMessage(Component.text("You have been sent to %s".formatted(smartRouter.getConfiguration().getSelectedServer().displayName())).color(NamedTextColor.GREEN).decorate(TextDecoration.ITALIC));
+            event.getPlayer().sendMessage(Component.text("You have been sent to %s".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN).decorate(TextDecoration.ITALIC));
+            //stop all instance stop timers
+            Pterodactyl.stopAllTimers();
         }
         else {
             event.getPlayer().disconnect(Component.text("An invalid configuration was detected. Please contact an admin."));
-            smartRouter.getLogger().error("Unable to find selected server %s in configuration during PlayerChooseInitalServerEvent.".formatted(smartRouter.getConfiguration().getSelectedServer().configName()));
+            SmartRouter.getLogger().error("Unable to find selected server %s in configuration during PlayerChooseInitalServerEvent.".formatted(selectedServer.configName()));
         }
     }
 

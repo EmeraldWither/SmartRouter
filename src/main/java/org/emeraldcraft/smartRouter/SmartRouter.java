@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.emeraldcraft.smartRouter.components.Configuration;
+import org.emeraldcraft.smartRouter.events.PlayerLeaveEvents;
 import org.emeraldcraft.smartRouter.events.PlayerLoginEvents;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurateException;
@@ -26,10 +27,12 @@ import java.util.UUID;
 public class SmartRouter {
 
     @Inject
-    private ProxyServer server;
+    private static ProxyServer server;
 
     @Inject
     private Logger logger;
+
+    private static Logger staticLogger;
 
     @DataDirectory
     @Inject
@@ -39,10 +42,22 @@ public class SmartRouter {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws ConfigurateException {
-        reloadConfiguration();
-        new CommandHandler(this);
-        server.getEventManager().register(this, new PlayerLoginEvents(this));
-        logger.info("SmartRouter has been initialized!");
+        try{
+            staticLogger = logger;
+            logger.info("SmartRouter is initializing...");
+            logger.info("Data Directory: {}", dataDirectory.toAbsolutePath());
+            logger.info("Loading configuration...");
+            reloadConfiguration();
+            logger.info("Registering commands...");
+            new CommandHandler(this);
+            logger.info("Registering events...");
+            server.getEventManager().register(this, new PlayerLoginEvents(this));
+            server.getEventManager().register(this, new PlayerLeaveEvents(this));
+
+            logger.info("SmartRouter has been initialized!");
+        } catch (Exception e) {
+            logger.error("SmartRouter could not be initialized!", e);
+        }
     }
 
 
@@ -62,7 +77,7 @@ public class SmartRouter {
         return Component.empty().append(Component.text("Emerald", NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD)).append(Component.text("Craft", NamedTextColor.GREEN).append(Component.text(" SmartRouter Proxy", NamedTextColor.GOLD))).decorate().appendNewline()
                 .append(Component.text("Current Configuration: ", NamedTextColor.RED)).append(Component.text(server, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD));
     }
-    public ProxyServer getProxyServer() {
+    public static ProxyServer getProxyServer() {
         return server;
     }
 
@@ -71,11 +86,11 @@ public class SmartRouter {
     }
 
     public void reloadConfiguration() throws ConfigurateException {
-        this.configuration = new Configuration(dataDirectory, this);
+        this.configuration = new Configuration(dataDirectory);
         this.configuration.load();
     }
 
-    public Logger getLogger() {
-        return logger;
+    public static Logger getLogger() {
+        return staticLogger;
     }
 }

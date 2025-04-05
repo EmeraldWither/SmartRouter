@@ -1,6 +1,7 @@
 package org.emeraldcraft.smartRouter;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
@@ -8,15 +9,15 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.emeraldcraft.smartRouter.components.ChildServer;
+import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
 
 public class CommandHandler {
 
     private final SmartRouter smartRouter;
-    private final ProxyServer server;
 
     public CommandHandler(SmartRouter smartRouter) {
         this.smartRouter = smartRouter;
-        this.server = smartRouter.getProxyServer();
+        ProxyServer server = SmartRouter.getProxyServer();
 
         CommandMeta meta = server.getCommandManager().metaBuilder("smartrouter")
                 .aliases("router")
@@ -26,6 +27,8 @@ public class CommandHandler {
         LiteralCommandNode<CommandSource> routerCommand = BrigadierCommand.literalArgumentBuilder("router")
                 .then(createServerListCommand())
                 .then(createReloadConfigCommand())
+                .then(createStartServerCommand())
+                .then(createStopServerCommand())
                 .build();
         server.getCommandManager().register(meta, new BrigadierCommand(routerCommand));
 
@@ -63,4 +66,34 @@ public class CommandHandler {
                         }
                 );
     }
+
+    private LiteralCommandNode<CommandSource> createStartServerCommand() {
+        return BrigadierCommand.literalArgumentBuilder("startserver")
+                .then(
+                        BrigadierCommand.requiredArgumentBuilder("name", StringArgumentType.word())
+                                .executes(
+                                        context -> {
+                                            String serverName = StringArgumentType.getString(context, "name");
+                                            ChildServer server = smartRouter.getConfiguration().childServerFromName(serverName);
+                                            Pterodactyl.startServer(server, smartRouter.getConfiguration());
+                                            return Command.SINGLE_SUCCESS;
+                                        }
+                                )
+                ).build();
+    }
+    private LiteralCommandNode<CommandSource> createStopServerCommand() {
+        return BrigadierCommand.literalArgumentBuilder("startserver")
+                .then(
+                        BrigadierCommand.requiredArgumentBuilder("name", StringArgumentType.word())
+                                .executes(
+                                        context -> {
+                                            String serverName = StringArgumentType.getString(context, "name");
+                                            ChildServer server = smartRouter.getConfiguration().childServerFromName(serverName);
+                                            Pterodactyl.stopServer(server, smartRouter.getConfiguration());
+                                            return Command.SINGLE_SUCCESS;
+                                        }
+                                )
+                ).build();
+    }
+
 }
