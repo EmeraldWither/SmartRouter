@@ -15,6 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.emeraldcraft.smartRouter.components.Configuration;
 import org.emeraldcraft.smartRouter.events.PlayerLeaveEvents;
 import org.emeraldcraft.smartRouter.events.PlayerLoginEvents;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurateException;
 
@@ -27,7 +28,9 @@ import java.util.UUID;
 public class SmartRouter {
 
     @Inject
-    private static ProxyServer server;
+    private ProxyServer server;
+    private static ProxyServer staticServer;
+    private static SmartRouter instance;
 
     @Inject
     private Logger logger;
@@ -43,6 +46,8 @@ public class SmartRouter {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws ConfigurateException {
         try{
+            instance = this;
+            staticServer = server;
             staticLogger = logger;
             logger.info("SmartRouter is initializing...");
             logger.info("Data Directory: {}", dataDirectory.toAbsolutePath());
@@ -75,12 +80,14 @@ public class SmartRouter {
 
     private static Component buildConfigurationMOTD(String server) {
         return Component.empty().append(Component.text("Emerald", NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD)).append(Component.text("Craft", NamedTextColor.GREEN).append(Component.text(" SmartRouter Proxy", NamedTextColor.GOLD))).decorate().appendNewline()
-                .append(Component.text("Current Configuration: ", NamedTextColor.RED)).append(Component.text(server, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD));
+                .append(Component.text("Current Server: ", NamedTextColor.RED)).append(Component.text(server, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD));
     }
     public static ProxyServer getProxyServer() {
-        return server;
+        return staticServer;
     }
-
+    public static SmartRouter getInstance() {
+        return instance;
+    }
     public Configuration getConfiguration() {
         return configuration;
     }

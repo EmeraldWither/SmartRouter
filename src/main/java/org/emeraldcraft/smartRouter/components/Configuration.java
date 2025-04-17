@@ -113,6 +113,9 @@ public class Configuration {
     }
 
     private void createFileIfNotFound() {
+        if (!path.toFile().exists()) {
+            path.toFile().mkdirs();
+        }
         File file = path.resolve("config.yml").toFile();
         if (file.exists()) {
             return;

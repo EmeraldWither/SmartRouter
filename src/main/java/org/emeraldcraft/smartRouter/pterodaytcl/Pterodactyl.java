@@ -71,7 +71,7 @@ public class Pterodactyl {
         if (instanceStopTimers.get(server) != null) {
             instanceStopTimers.get(server).cancel();
         }
-        ScheduledTask task = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.class, () -> {
+        ScheduledTask task = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.getInstance(), () -> {
             SmartRouter.getLogger().info("30 seconds has passed. Stopping instance %s for server %s.".formatted(server.awsInstanceID(), server.displayName()));
             Ec2Client ec2Client = configuration.getEc2Client();
             ec2Client.stopInstances(StopInstancesRequest.builder().instanceIds(server.awsInstanceID()).build());
@@ -85,11 +85,10 @@ public class Pterodactyl {
             SmartRouter.getLogger().info("Pterodactyl cannot communicate with instance, so %s offline.".formatted(server.displayName()));
             return false;
         } else if (serverInfo.startsWith("<!DOCTYPE html>")) {
-            SmartRouter.getLogger().info("Weird server info " + serverInfo);
+            SmartRouter.getLogger().info("Weird server info. CHECK API KEY!!!!!!!! " + serverInfo);
             return false;
         } else {
             JsonObject json = (new Gson()).fromJson(serverInfo, JsonObject.class);
-            SmartRouter.getLogger().info(serverInfo);
             String state = json.getAsJsonObject("attributes").get("current_state").getAsString();
             if (state.equalsIgnoreCase("starting")) {
                 SmartRouter.getLogger().info("Pterodactyl says %s is starting.".formatted(server.displayName()));
@@ -152,7 +151,7 @@ public class Pterodactyl {
     }
 
     public static void stopServerDelayed(Configuration configuration) {
-        pteroStopTimer = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.class, () -> {
+        pteroStopTimer = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.getInstance(), () -> {
             SmartRouter.getLogger().info("Stopping the instance and all child servers.");
             for(ChildServer server : configuration.getConfiguredChildServers()) {
                 if(!server.autoStart()) continue;

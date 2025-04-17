@@ -82,7 +82,7 @@ public class CommandHandler {
                 ).build();
     }
     private LiteralCommandNode<CommandSource> createStopServerCommand() {
-        return BrigadierCommand.literalArgumentBuilder("startserver")
+        return BrigadierCommand.literalArgumentBuilder("stopserver")
                 .then(
                         BrigadierCommand.requiredArgumentBuilder("name", StringArgumentType.word())
                                 .executes(

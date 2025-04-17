@@ -1,5 +1,5 @@
 ptero_api_key: "ABCDEF"
-ptero_panel_url: "https://example.com"
+ptero_panel_url: "example.com"
 aws_instance_id: "fds"
 
 maintenance: true

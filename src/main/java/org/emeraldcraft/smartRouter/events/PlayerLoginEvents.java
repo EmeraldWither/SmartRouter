@@ -62,39 +62,48 @@ public class PlayerLoginEvents {
     }
     @Subscribe
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
-        Configuration configuration = smartRouter.getConfiguration();
-        ChildServer selectedServer = configuration.getSelectedServer();
-        Optional<RegisteredServer> server = SmartRouter.getProxyServer().getServer(selectedServer.configName());
-        if(server.isPresent()) {
-            //check for instance state, or start server
+        try {
+            Configuration configuration = smartRouter.getConfiguration();
+            ChildServer selectedServer = configuration.getSelectedServer();
+            Optional<RegisteredServer> server = SmartRouter.getProxyServer().getServer(selectedServer.configName());
+            if(server.isPresent()) {
+                //check for instance state, or start server
 
-            String state = Pterodactyl.getServerState(selectedServer, configuration);
-            if (state.equalsIgnoreCase("stopped")) {
-                Pterodactyl.startServer(selectedServer, configuration);
-                SmartRouter.getLogger().info("Starting the server %s!".formatted(selectedServer.displayName()));
-                event.getPlayer().disconnect(Component.text("You have started the server %s".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN));
-                return;
+                String state = Pterodactyl.getServerState(selectedServer, configuration);
+                if (state.equalsIgnoreCase("stopped")) {
+                    if(selectedServer.autoStart()) {
+                        Pterodactyl.startServer(selectedServer, configuration);
+                        SmartRouter.getLogger().info("Starting the server %s!".formatted(selectedServer.displayName()));
+                        event.getPlayer().disconnect(Component.text("You have started the server %s".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN));
+                        return;
+                    }
+                    event.getPlayer().disconnect(Component.text("%s is offline, and cannot be automatically started.".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
+                    return;
+                }
+                if (state.equalsIgnoreCase("starting")) {
+                    event.getPlayer().disconnect(Component.text("The server %s is still starting.".formatted(selectedServer.displayName())).color(NamedTextColor.GOLD));
+                    return;
+                }
+
+                if (state.equalsIgnoreCase("stopping")) {
+                    SmartRouter.getLogger().info("Server is stopping. Cannot run any actions.");
+                    event.getPlayer().disconnect(Component.text("The server %s is stopping, and cannot have actions run on it. Try again in a bit...".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
+                    return;
+                }
+
+
+                event.setInitialServer(server.get());
+                event.getPlayer().sendMessage(Component.text("You have been sent to %s".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN).decorate(TextDecoration.ITALIC));
+                //stop all instance stop timers
+                Pterodactyl.stopAllTimers();
             }
-            if (state.equalsIgnoreCase("starting")) {
-                event.getPlayer().disconnect(Component.text("The server %s is still starting.".formatted(selectedServer.displayName())).color(NamedTextColor.GOLD));
-                return;
+            else {
+                event.getPlayer().disconnect(Component.text("An invalid configuration was detected. Please contact an admin."));
+                SmartRouter.getLogger().error("Unable to find selected server %s in configuration during PlayerChooseInitialServerEvent.".formatted(selectedServer.configName()));
             }
-
-            if (state.equalsIgnoreCase("stopping")) {
-                SmartRouter.getLogger().info("Server is stopping. Cannot run any actions.");
-                event.getPlayer().disconnect(Component.text("The server %s is stopping, and cannot have actions run on it. Try again in a bit...".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
-                return;
-            }
-
-
-            event.setInitialServer(server.get());
-            event.getPlayer().sendMessage(Component.text("You have been sent to %s".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN).decorate(TextDecoration.ITALIC));
-            //stop all instance stop timers
-            Pterodactyl.stopAllTimers();
-        }
-        else {
-            event.getPlayer().disconnect(Component.text("An invalid configuration was detected. Please contact an admin."));
-            SmartRouter.getLogger().error("Unable to find selected server %s in configuration during PlayerChooseInitalServerEvent.".formatted(selectedServer.configName()));
+        } catch (Exception e) {
+            event.getPlayer().disconnect(Component.text("An internal error has occurred while redirecting you. Notify an admin."));
+            SmartRouter.getLogger().error("An error has occurred while redirecting player %s to the server.".formatted(event.getPlayer().getUsername()), e);
         }
     }
 
