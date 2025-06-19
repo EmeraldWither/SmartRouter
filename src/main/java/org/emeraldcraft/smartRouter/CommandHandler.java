@@ -90,6 +90,7 @@ public class CommandHandler {
                                             String serverName = StringArgumentType.getString(context, "name");
                                             ChildServer server = smartRouter.getConfiguration().childServerFromName(serverName);
                                             Pterodactyl.startServer(server, smartRouter.getConfiguration());
+                                            SmartRouter.getProxyServer().sendMessage(Component.text("Starting server..."));
                                             return Command.SINGLE_SUCCESS;
                                         }
                                 )
@@ -104,6 +105,7 @@ public class CommandHandler {
                                             String serverName = StringArgumentType.getString(context, "name");
                                             ChildServer server = smartRouter.getConfiguration().childServerFromName(serverName);
                                             Pterodactyl.stopServer(server, smartRouter.getConfiguration());
+                                            SmartRouter.getProxyServer().sendMessage(Component.text("Stopping server..."));
                                             return Command.SINGLE_SUCCESS;
                                         }
                                 )
