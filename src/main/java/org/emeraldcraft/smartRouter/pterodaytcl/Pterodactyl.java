@@ -99,7 +99,12 @@ public class Pterodactyl {
             } else if (state.equalsIgnoreCase("stopping")) {
                 SmartRouter.getLogger().info("Ptero says stopping %s.".formatted(server.displayName()));
                 return false;
-            } else {
+            }
+            else if (state.equalsIgnoreCase("offline")) {
+                SmartRouter.getLogger().info("Ptero says offline %s.".formatted(server.displayName()));
+                return false;
+            }
+            else {
                 SmartRouter.getLogger().warn("Server State Failed: " + serverInfo);
                 return false;
             }
@@ -151,6 +156,8 @@ public class Pterodactyl {
     }
 
     public static void stopServerDelayed(Configuration configuration) {
+        if(pteroStopTimer != null) pteroStopTimer.cancel();
+        pteroStopTimer = null;
         pteroStopTimer = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.getInstance(), () -> {
             SmartRouter.getLogger().info("Stopping the instance and all child servers.");
             for(ChildServer server : configuration.getConfiguredChildServers()) {
@@ -162,6 +169,7 @@ public class Pterodactyl {
 
     public static void stopAllTimers() {
         for(ChildServer server : instanceStopTimers.keySet()) {
+            if(server == null) continue;
             if(instanceStopTimers.get(server) != null) {
                 instanceStopTimers.get(server).cancel();
                 instanceStopTimers.remove(server);

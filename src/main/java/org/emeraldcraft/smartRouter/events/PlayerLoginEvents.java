@@ -80,18 +80,19 @@ public class PlayerLoginEvents {
                     event.getPlayer().disconnect(Component.text("%s is offline, and cannot be automatically started.".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
                     return;
                 }
-                if (state.equalsIgnoreCase("starting")) {
+                else if (state.equalsIgnoreCase("starting")) {
                     event.getPlayer().disconnect(Component.text("The server %s is still starting.".formatted(selectedServer.displayName())).color(NamedTextColor.GOLD));
                     return;
                 }
 
-                if (state.equalsIgnoreCase("stopping")) {
+
+                else if (state.equalsIgnoreCase("stopping")) {
                     SmartRouter.getLogger().info("Server is stopping. Cannot run any actions.");
                     event.getPlayer().disconnect(Component.text("The server %s is stopping, and cannot have actions run on it. Try again in a bit...".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
                     return;
                 }
 
-
+                SmartRouter.getLogger().info("Allowed player to connect to %s".formatted(selectedServer.displayName()));
                 event.setInitialServer(server.get());
                 event.getPlayer().sendMessage(Component.text("You have been sent to %s".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN).decorate(TextDecoration.ITALIC));
                 //stop all instance stop timers

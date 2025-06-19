@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.emeraldcraft'
-version = '1.0-PROD'
+version = '1.2-PROD'
 
 repositories {
     mavenCentral()
