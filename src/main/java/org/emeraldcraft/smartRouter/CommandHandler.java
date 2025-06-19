@@ -2,12 +2,14 @@ package org.emeraldcraft.smartRouter;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.kyori.adventure.text.Component;
 import org.emeraldcraft.smartRouter.components.ChildServer;
 import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
 
@@ -29,10 +31,22 @@ public class CommandHandler {
                 .then(createReloadConfigCommand())
                 .then(createStartServerCommand())
                 .then(createStopServerCommand())
+                .then(helpCommand())
                 .build();
         server.getCommandManager().register(meta, new BrigadierCommand(routerCommand));
 
     }
+
+    private LiteralArgumentBuilder<CommandSource> helpCommand() {
+        return BrigadierCommand.literalArgumentBuilder("help")
+                .executes(context -> {
+                    SmartRouter.getProxyServer().sendMessage(
+                            Component.text("list - list servers ; reload - reload config; startserver [name] - starts the server ; stopserver [name] - stops the server")
+                    );
+                    return Command.SINGLE_SUCCESS;
+                });
+    }
+
     private LiteralArgumentBuilder<CommandSource> createServerListCommand() {
         return BrigadierCommand.literalArgumentBuilder("list")
                 .executes(
