@@ -18,6 +18,7 @@ import org.emeraldcraft.smartRouter.events.PlayerLoginEvents;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurateException;
+import webserver.ServerIDProvider;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -43,6 +44,8 @@ public class SmartRouter {
 
     private Configuration configuration;
 
+    private ServerIDProvider serverIDProvider;
+
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws ConfigurateException {
         try{
@@ -58,6 +61,9 @@ public class SmartRouter {
             logger.info("Registering events...");
             server.getEventManager().register(this, new PlayerLoginEvents(this));
             server.getEventManager().register(this, new PlayerLeaveEvents(this));
+            logger.info("Creating the webserver...");
+            serverIDProvider = new ServerIDProvider();
+            serverIDProvider.init();
 
             logger.info("SmartRouter has been initialized!");
         } catch (Exception e) {
