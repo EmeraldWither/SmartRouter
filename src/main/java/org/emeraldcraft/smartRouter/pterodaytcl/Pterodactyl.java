@@ -19,7 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -168,13 +170,15 @@ public class Pterodactyl {
     }
 
     public static void stopAllTimers() {
+        List<ChildServer> removedServers = new ArrayList<>();
         for(ChildServer server : instanceStopTimers.keySet()) {
             if(server == null) continue;
             if(instanceStopTimers.get(server) != null) {
                 instanceStopTimers.get(server).cancel();
-                instanceStopTimers.remove(server);
+                removedServers.add(server);
             }
         }
+        removedServers.forEach(instanceStopTimers::remove);
         if(pteroStopTimer != null) {
             pteroStopTimer.cancel();
         }
