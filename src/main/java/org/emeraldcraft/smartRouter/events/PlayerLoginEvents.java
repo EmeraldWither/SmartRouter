@@ -32,8 +32,12 @@ public class PlayerLoginEvents {
             SmartRouter.getLogger().info("[prelogin] Player %s attempted to join during maintenance mode.".formatted(event.getUsername()));
             return;
         }
+        PreLoginEvent.PreLoginComponentResult denied = PreLoginEvent.PreLoginComponentResult.denied(Component.text("You are not whitelisted to be part of the network.").color(NamedTextColor.RED));
+        if(event.getUniqueId() == null) {
+            event.setResult(denied);
+            SmartRouter.getLogger().warn("[prelogin] Unable to find a UUID for the ip '%s'; has been kicked.".formatted(event.getConnection().getRemoteAddress().getHostString()));
+        }
         if (!smartRouter.getConfiguration().getAllowList().contains(event.getUniqueId().toString())) {
-            PreLoginEvent.PreLoginComponentResult denied = PreLoginEvent.PreLoginComponentResult.denied(Component.text("You are not whitelisted to be part of the network.").color(NamedTextColor.RED));
             event.setResult(denied);
             SmartRouter.getLogger().warn("[prelogin] Player %s (UUID %s) attempted to join but is not on the allowlist.".formatted(event.getUsername(), event.getUniqueId()));
         }
