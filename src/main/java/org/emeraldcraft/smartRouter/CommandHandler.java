@@ -31,6 +31,9 @@ public class CommandHandler {
                 .then(createReloadConfigCommand())
                 .then(createStartServerCommand())
                 .then(createStopServerCommand())
+                .then(createStartTimerCommand())
+                .then(createStopTimerCommand())
+                .then(createMaintenanceCommand())
                 .then(helpCommand())
                 .build();
         server.getCommandManager().register(meta, new BrigadierCommand(routerCommand));
@@ -41,7 +44,7 @@ public class CommandHandler {
         return BrigadierCommand.literalArgumentBuilder("help")
                 .executes(context -> {
                     SmartRouter.getProxyServer().sendMessage(
-                            Component.text("list - list servers ; reload - reload config; startserver [name] - starts the server ; stopserver [name] - stops the server")
+                            Component.text("list - list servers ; reload - reload config; startserver [name] - starts the server ; stopserver [name] - stops the server; maintenance [true/false] - temporarily sets the maintenance value until the next reboot ; starttimer - starts the stop timers to stop the instances ; stoptimer - stops the stop timers do the server does not shut down")
                     );
                     return Command.SINGLE_SUCCESS;
                 });
@@ -110,6 +113,39 @@ public class CommandHandler {
                                         }
                                 )
                 ).build();
+    }
+
+    private LiteralCommandNode<CommandSource> createStartTimerCommand() {
+        return BrigadierCommand.literalArgumentBuilder("starttimer")
+                .executes(context -> {
+                    Pterodactyl.stopServerDelayed(smartRouter.getConfiguration());
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
+    }
+
+    private LiteralCommandNode<CommandSource> createStopTimerCommand() {
+        return BrigadierCommand.literalArgumentBuilder("canceltimer")
+                .executes(context -> {
+                    SmartRouter.getLogger().info("Cancelling all the stop timers.");
+                    Pterodactyl.stopAllTimers();
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
+    }
+
+    private LiteralCommandNode<CommandSource> createMaintenanceCommand() {
+        return BrigadierCommand.literalArgumentBuilder("maintenance")
+                .then(
+                        BrigadierCommand.requiredArgumentBuilder("value", StringArgumentType.word())
+                                .executes(context -> {
+                                    boolean value = Boolean.parseBoolean(StringArgumentType.getString(context, "value"));
+                                    smartRouter.getConfiguration().setMaintenance(value);
+                                    SmartRouter.getLogger().info("Set the temporary maintenance mode to %s".formatted(value));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                )
+                .build();
     }
 
 }

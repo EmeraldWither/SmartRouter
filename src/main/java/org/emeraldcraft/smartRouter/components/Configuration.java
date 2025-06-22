@@ -167,4 +167,8 @@ public class Configuration {
     public Ec2Client getEc2Client() {
         return ec2Client;
     }
+
+    public void setMaintenance(boolean value) {
+        this.maintenance = value;
+    }
 }

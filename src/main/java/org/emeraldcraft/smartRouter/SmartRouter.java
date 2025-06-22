@@ -77,16 +77,18 @@ public class SmartRouter {
     public void onPlayerMOTDPing(ProxyPingEvent event) {
         Optional<Favicon> favicon = server.getConfiguration().getFavicon();
         ServerPing.Players players = new ServerPing.Players(1, 1, List.of(new ServerPing.SamplePlayer("EmerqldWither", UUID.randomUUID())));
-        ServerPing ping;
-
-        if(configuration.isMaintenance()) ping = new ServerPing(event.getPing().getVersion(), players, buildConfigurationMOTD(configuration.getMaintenanceMessage()), favicon.orElse(null));
-        else ping = new ServerPing(event.getPing().getVersion(), players, buildConfigurationMOTD(configuration.getSelectedServer().displayName()), favicon.orElse(null));
+        ServerPing ping = new ServerPing(event.getPing().getVersion(), players, buildConfigurationMOTD(configuration), favicon.orElse(null));
         event.setPing(ping);
     }
 
-    private static Component buildConfigurationMOTD(String server) {
+    private static Component buildConfigurationMOTD(Configuration configuration) {
+        String server = configuration.getSelectedServer().displayName();
         return Component.empty().append(Component.text("Emerald", NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD)).append(Component.text("Craft", NamedTextColor.GREEN).append(Component.text(" SmartRouter Proxy", NamedTextColor.GOLD))).decorate().appendNewline()
-                .append(Component.text("Current Server: ", NamedTextColor.RED)).append(Component.text(server, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD));
+                .append(buildCurrentServerMOTD(configuration));
+    }
+    private static Component buildCurrentServerMOTD(Configuration configuration) {
+        if(configuration.isMaintenance()) return Component.text(configuration.getMaintenanceMessage()).color(NamedTextColor.RED).decorate(TextDecoration.BOLD);
+        return Component.text("Current Server: ").color(NamedTextColor.DARK_AQUA).append(Component.text(configuration.getSelectedServer().displayName(), NamedTextColor.AQUA).decorate(TextDecoration.BOLD));
     }
     public static ProxyServer getProxyServer() {
         return staticServer;

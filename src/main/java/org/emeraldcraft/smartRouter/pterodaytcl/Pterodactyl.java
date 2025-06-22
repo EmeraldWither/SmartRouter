@@ -160,8 +160,9 @@ public class Pterodactyl {
     public static void stopServerDelayed(Configuration configuration) {
         if(pteroStopTimer != null) pteroStopTimer.cancel();
         pteroStopTimer = null;
+        SmartRouter.getLogger().info("Started the stop timers for instances. The servers will stop in 5 minutes.");
         pteroStopTimer = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.getInstance(), () -> {
-            SmartRouter.getLogger().info("Stopping the instance and all child servers.");
+            SmartRouter.getLogger().info("Stopping the child servers, then will stop instances.");
             for(ChildServer server : configuration.getConfiguredChildServers()) {
                 if(!server.autoStart()) continue;
                 stopServer(server, configuration);
