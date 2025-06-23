@@ -36,6 +36,7 @@ public class PlayerLoginEvents {
         if(event.getUniqueId() == null) {
             event.setResult(denied);
             SmartRouter.getLogger().warn("[prelogin] Unable to find a UUID for the ip '%s'; has been kicked.".formatted(event.getConnection().getRemoteAddress().getHostString()));
+            return;
         }
         if (!smartRouter.getConfiguration().getAllowList().contains(event.getUniqueId().toString())) {
             event.setResult(denied);
