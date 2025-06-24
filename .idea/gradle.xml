@@ -9,6 +9,15 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/ServerStarter" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/ServerDaemon" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/ServerDaemon" />
           </set>
         </option>
       </GradleProjectSettings>
