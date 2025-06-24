@@ -40,6 +40,10 @@ public class Pterodactyl {
             ec2Client.startInstances(StartInstancesRequest.builder().instanceIds(server.awsInstanceID()).build());
         }
     }
+
+    public static void instantStartServer() {
+
+    }
     public static void stopServer(ChildServer server, Configuration configuration) {
         try {
             String panelURL = configuration.getPteroPanelURL();
