@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import org.emeraldcraft.smartRouter.SmartRouter;
-import org.emeraldcraft.smartRouter.components.ChildServer;
+import org.emeraldcraft.smartRouter.components.ChildServerConfig;
 import org.emeraldcraft.smartRouter.components.Configuration;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusRequest;
@@ -26,9 +26,9 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class Pterodactyl {
-    private static final HashMap<ChildServer, ScheduledTask> instanceStopTimers = new HashMap<>();
+    private static final HashMap<ChildServerConfig, ScheduledTask> instanceStopTimers = new HashMap<>();
     private static ScheduledTask pteroStopTimer;
-    public static void startServer(ChildServer server, Configuration configuration) {
+    public static void startServer(ChildServerConfig server, Configuration configuration) {
         if(getServerState(server, configuration).equals("stopping")) {
             SmartRouter.getLogger().warn("Server is stopping. Cannot start server.");
             return;
@@ -40,7 +40,7 @@ public class Pterodactyl {
             ec2Client.startInstances(StartInstancesRequest.builder().instanceIds(server.awsInstanceID()).build());
         }
     }
-    public static void stopServer(ChildServer server, Configuration configuration) {
+    public static void stopServer(ChildServerConfig server, Configuration configuration) {
         try {
             String panelURL = configuration.getPteroPanelURL();
             String serverID = server.pteroServerID();
@@ -81,7 +81,7 @@ public class Pterodactyl {
         instanceStopTimers.put(server, task);
     }
 
-    public static boolean isServerOnline(ChildServer server, Configuration configuration) {
+    public static boolean isServerOnline(ChildServerConfig server, Configuration configuration) {
         String serverInfo = getResponse(configuration.getPteroPanelURL(), server.pteroServerID(), configuration.getPteroAPIKey());
         if (serverInfo.contains("\"detail\": \"Could not establish a connection to the machine running this server. Please try again.\"")) {
             SmartRouter.getLogger().info("Pterodactyl cannot communicate with instance, so %s offline.".formatted(server.displayName()));
@@ -113,7 +113,7 @@ public class Pterodactyl {
         }
     }
 
-    public static String getServerState(ChildServer server, Configuration configuration) {
+    public static String getServerState(ChildServerConfig server, Configuration configuration) {
         String currentStatus = getInstanceState(server, configuration);
         if (!currentStatus.equalsIgnoreCase("running")) {
             SmartRouter.getLogger().info("Current EC2 Instance State: " + currentStatus);
@@ -126,12 +126,12 @@ public class Pterodactyl {
         }
     }
 
-    private static String getInstanceState(ChildServer server, Configuration configuration) {
+    public static String getInstanceState(ChildServerConfig server, Configuration configuration) {
         Ec2Client ec2Client = configuration.getEc2Client();
         DescribeInstanceStatusResponse response = ec2Client.describeInstanceStatus(DescribeInstanceStatusRequest.builder().instanceIds(server.awsInstanceID()).includeAllInstances(true).build());
         return response.instanceStatuses().get(0).instanceState().nameAsString();
     }
-    private static String getResponse(String panelURL, String serverID, String apiKey) {
+    public static String getResponse(String panelURL, String serverID, String apiKey) {
         try {
             URL url = new URL(panelURL + "/api/client/servers/" + serverID + "/resources");
             HttpURLConnection http = (HttpURLConnection)url.openConnection();
@@ -163,7 +163,7 @@ public class Pterodactyl {
         SmartRouter.getLogger().info("Started the stop timers for instances. The servers will stop in 5 minutes.");
         pteroStopTimer = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.getInstance(), () -> {
             SmartRouter.getLogger().info("Stopping the child servers, then will stop instances.");
-            for(ChildServer server : configuration.getConfiguredChildServers()) {
+            for(ChildServerConfig server : configuration.getConfiguredChildServers()) {
                 if(!server.autoStart()) continue;
                 stopServer(server, configuration);
             }
@@ -171,8 +171,8 @@ public class Pterodactyl {
     }
 
     public static void stopAllTimers() {
-        List<ChildServer> removedServers = new ArrayList<>();
-        for(ChildServer server : instanceStopTimers.keySet()) {
+        List<ChildServerConfig> removedServers = new ArrayList<>();
+        for(ChildServerConfig server : instanceStopTimers.keySet()) {
             if(server == null) continue;
             if(instanceStopTimers.get(server) != null) {
                 instanceStopTimers.get(server).cancel();

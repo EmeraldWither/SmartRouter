@@ -10,12 +10,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.emeraldcraft.smartRouter.SmartRouter;
-import org.emeraldcraft.smartRouter.components.ChildServer;
+import org.emeraldcraft.smartRouter.components.ChildServerConfig;
 import org.emeraldcraft.smartRouter.components.Configuration;
 import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
 
 import java.util.Optional;
-import java.util.logging.Logger;
 
 public class PlayerLoginEvents {
     private final SmartRouter smartRouter;
@@ -69,7 +68,7 @@ public class PlayerLoginEvents {
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
         try {
             Configuration configuration = smartRouter.getConfiguration();
-            ChildServer selectedServer = configuration.getSelectedServer();
+            ChildServerConfig selectedServer = configuration.getSelectedServer();
             Optional<RegisteredServer> server = SmartRouter.getProxyServer().getServer(selectedServer.configName());
             if(server.isPresent()) {
                 //check for instance state, or start server

@@ -20,8 +20,8 @@ public class Configuration {
 
     private boolean maintenance = true;
     private String maintenanceMessage = "Wrong Configuration. Contact Admin.";
-    private final List<ChildServer> configuredChildServers = new ArrayList<>();
-    private ChildServer selectedServer;
+    private final List<ChildServerConfig> configuredChildServerConfigs = new ArrayList<>();
+    private ChildServerConfig selectedServer;
     private String pteroPanelURL;
     private String pteroAPIKey;
     private Ec2Client ec2Client;
@@ -49,8 +49,8 @@ public class Configuration {
             String pteroServerId = node.node("ptero_server_id").getString();
             boolean autoStart = node.node("auto_start").getBoolean();
             String awsInstanceId = root.node("aws_instance_id").getString();
-            ChildServer childServer = new ChildServer(serverName.toString(), Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), Objects.requireNonNull(awsInstanceId), autoStart);
-            configuredChildServers.add(childServer);
+            ChildServerConfig childServerConfig = new ChildServerConfig(serverName.toString(), Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), Objects.requireNonNull(awsInstanceId), autoStart);
+            configuredChildServerConfigs.add(childServerConfig);
         });
 
         root.node("allowlist").childrenList().forEach(node -> {
@@ -63,10 +63,10 @@ public class Configuration {
         //find the selected server
         String selectedServer = root.node("selected_server").getString();
         boolean found = false;
-        for (ChildServer childServer : configuredChildServers) {
-            if (childServer.configName().equals(selectedServer)) {
+        for (ChildServerConfig childServerConfig : configuredChildServerConfigs) {
+            if (childServerConfig.configName().equals(selectedServer)) {
                 found = true;
-                this.selectedServer = childServer;
+                this.selectedServer = childServerConfig;
                 break;
             }
         }
@@ -97,16 +97,16 @@ public class Configuration {
                         maintenance,
                         maintenanceMessage,
                         getSelectedServer().displayName(),
-                        configuredChildServers.stream().map(ChildServer::displayName).toList(),
+                        configuredChildServerConfigs.stream().map(ChildServerConfig::displayName).toList(),
                         allowList.stream().map(String::toString).toList()
                 )
         );
     }
 
-    public ChildServer childServerFromName(String serverName) {
-        for (ChildServer childServer : configuredChildServers) {
-            if (childServer.configName().equals(serverName)) {
-                return childServer;
+    public ChildServerConfig childServerFromName(String serverName) {
+        for (ChildServerConfig childServerConfig : configuredChildServerConfigs) {
+            if (childServerConfig.configName().equals(serverName)) {
+                return childServerConfig;
             }
         }
         throw new IllegalArgumentException("Cannot find server with name %s".formatted(serverName));
@@ -144,12 +144,12 @@ public class Configuration {
         return maintenanceMessage;
     }
 
-    public ChildServer getSelectedServer() {
+    public ChildServerConfig getSelectedServer() {
         return selectedServer;
     }
 
-    public List<ChildServer> getConfiguredChildServers() {
-        return configuredChildServers;
+    public List<ChildServerConfig> getConfiguredChildServers() {
+        return configuredChildServerConfigs;
     }
 
     public List<String> getAllowList() {

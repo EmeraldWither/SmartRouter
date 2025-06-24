@@ -2,7 +2,6 @@ package org.emeraldcraft.smartRouter;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
@@ -10,7 +9,7 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
-import org.emeraldcraft.smartRouter.components.ChildServer;
+import org.emeraldcraft.smartRouter.components.ChildServerConfig;
 import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
 
 public class CommandHandler {
@@ -56,7 +55,7 @@ public class CommandHandler {
                         context -> {
                             StringBuilder serverList = new StringBuilder("Configured servers: \n");
                             context.getSource().sendPlainMessage("Current Server: " + smartRouter.getConfiguration().getSelectedServer().displayName());
-                            for (ChildServer server : smartRouter.getConfiguration().getConfiguredChildServers()) {
+                            for (ChildServerConfig server : smartRouter.getConfiguration().getConfiguredChildServers()) {
                                 serverList.append("ConfigName: ").append(server.configName())
                                         .append(", DisplayName: ").append(server.displayName())
                                         .append(", PteroServerID: ").append(server.pteroServerID())
@@ -91,7 +90,7 @@ public class CommandHandler {
                                 .executes(
                                         context -> {
                                             String serverName = StringArgumentType.getString(context, "name");
-                                            ChildServer server = smartRouter.getConfiguration().childServerFromName(serverName);
+                                            ChildServerConfig server = smartRouter.getConfiguration().childServerFromName(serverName);
                                             Pterodactyl.startServer(server, smartRouter.getConfiguration());
                                             SmartRouter.getProxyServer().sendMessage(Component.text("Starting server..."));
                                             return Command.SINGLE_SUCCESS;
@@ -106,7 +105,7 @@ public class CommandHandler {
                                 .executes(
                                         context -> {
                                             String serverName = StringArgumentType.getString(context, "name");
-                                            ChildServer server = smartRouter.getConfiguration().childServerFromName(serverName);
+                                            ChildServerConfig server = smartRouter.getConfiguration().childServerFromName(serverName);
                                             Pterodactyl.stopServer(server, smartRouter.getConfiguration());
                                             SmartRouter.getProxyServer().sendMessage(Component.text("Stopping server..."));
                                             return Command.SINGLE_SUCCESS;
