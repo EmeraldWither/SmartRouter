@@ -10,3 +10,4 @@ curl "https://____________/api/client/servers/$SERVER_ID/power" \
 }'
 
 # Start the java daemon
+java -jar ServerDaemon-0.0.1-SNAPSHOT.jar --ptero.apikey=_______ --ptero.panelurl=_____
