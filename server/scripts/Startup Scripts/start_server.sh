@@ -1,10 +1,12 @@
-SERVER_ID=$(curl http://survivalcraft.emeraldcraft.org:25564/serverid)
+SERVER_ID=$(curl http://____________/serverid)
 echo "$SERVER_ID"
-curl "https://panel.emeraldcraft.org/api/client/servers/$SERVER_ID/power" \
+curl "https://____________/api/client/servers/$SERVER_ID/power" \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer ptlc_YBaW6TNeT7IyawVjtC5NPOxAhl0cP0oX9f92gb4z1cd' \
+  -H 'Authorization: Bearer ____________' \
   -X POST \
   -d '{
   "signal": "start"
 }'
+
+# Start the java daemon
