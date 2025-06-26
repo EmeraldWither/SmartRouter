@@ -43,7 +43,7 @@ public class CommandHandler {
         return BrigadierCommand.literalArgumentBuilder("help")
                 .executes(context -> {
                     SmartRouter.getProxyServer().sendMessage(
-                            Component.text("list - list servers ; reload - reload config; startserver [name] - starts the server ; stopserver [name] - stops the server; maintenance [true/false] - temporarily sets the maintenance value until the next reboot ; starttimer - starts the stop timers to stop the instances ; stoptimer - stops the stop timers do the server does not shut down")
+                            Component.text("list - list servers ; reload - reload config; startserver [name] - starts the server ; stopserver [name] - stops the server; maintenance [true/false] - temporarily sets the maintenance value until the next reboot ; starttimer - starts the stop timers to stop the instances ; canceltimer - stops the stop timers do the server does not shut down")
                     );
                     return Command.SINGLE_SUCCESS;
                 });
@@ -91,7 +91,7 @@ public class CommandHandler {
                                         context -> {
                                             String serverName = StringArgumentType.getString(context, "name");
                                             ChildServerConfig server = smartRouter.getConfiguration().childServerFromName(serverName);
-                                            Pterodactyl.startServer(server, smartRouter.getConfiguration());
+                                            SmartRouter.getInstance().getServerManager().startServer(server);
                                             SmartRouter.getProxyServer().sendMessage(Component.text("Starting server..."));
                                             return Command.SINGLE_SUCCESS;
                                         }
@@ -115,11 +115,17 @@ public class CommandHandler {
 
     private LiteralCommandNode<CommandSource> createStartTimerCommand() {
         return BrigadierCommand.literalArgumentBuilder("starttimer")
-                .executes(context -> {
-                    Pterodactyl.stopServerDelayed(smartRouter.getConfiguration());
-                    return Command.SINGLE_SUCCESS;
-                })
-                .build();
+                .then(
+                        BrigadierCommand.requiredArgumentBuilder("name", StringArgumentType.word())
+                                .executes(
+                                        context -> {
+                                            String serverName = StringArgumentType.getString(context, "name");
+                                            ChildServerConfig server = smartRouter.getConfiguration().childServerFromName(serverName);
+                                            smartRouter.getServerManager().delayedShutdownServer(server);
+                                            return Command.SINGLE_SUCCESS;
+                                        }
+                                )
+                ).build();
     }
 
     private LiteralCommandNode<CommandSource> createStopTimerCommand() {

@@ -29,7 +29,7 @@ public class ServerManager {
         ChildServer server = fromConfig(childServerConfig);
         server.shutdownNow();
     }
-    public void delayedShutdownServerNow(ChildServerConfig childServerConfig) {
+    public void delayedShutdownServer(ChildServerConfig childServerConfig) {
         ChildServer server = fromConfig(childServerConfig);
         server.delayedShutdown();
     }
