@@ -14,7 +14,7 @@ public class PlayerLeaveEvents {
     public void onPlayerLeave(DisconnectEvent event) {
         if(SmartRouter.getProxyServer().getPlayerCount() == 0 && smartRouter.getConfiguration().getSelectedServer().autoStart()) {
             SmartRouter.getLogger().info("Everyone has left the proxy. Starting the stop timer.");
-            Pterodactyl.stopServerDelayed(smartRouter.getConfiguration());
+            SmartRouter.getInstance().getServerManager().delayedShutdownServerNow(smartRouter.getConfiguration().getSelectedServer());
         }
     }
 }

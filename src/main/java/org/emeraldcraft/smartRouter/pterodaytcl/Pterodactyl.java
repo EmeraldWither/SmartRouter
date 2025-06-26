@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class Pterodactyl {
     private static final HashMap<ChildServerConfig, ScheduledTask> instanceStopTimers = new HashMap<>();
     private static ScheduledTask pteroStopTimer;
@@ -139,6 +140,7 @@ public class Pterodactyl {
             http.setDoOutput(true);
             http.setRequestProperty("Content-Type", "application/json");
             http.setRequestProperty("Authorization", "Bearer " + apiKey);
+            http.setReadTimeout(1500);
             http.connect();
             String serverInfo = parseInputStream(http.getInputStream());
             http.disconnect();

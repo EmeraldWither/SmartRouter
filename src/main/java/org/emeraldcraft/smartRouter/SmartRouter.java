@@ -15,6 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.emeraldcraft.smartRouter.components.Configuration;
 import org.emeraldcraft.smartRouter.events.PlayerLeaveEvents;
 import org.emeraldcraft.smartRouter.events.PlayerLoginEvents;
+import org.emeraldcraft.smartRouter.manager.ServerManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurateException;
@@ -46,6 +47,8 @@ public class SmartRouter {
 
     private ServerIDProvider serverIDProvider;
 
+    private ServerManager serverManager;
+
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws ConfigurateException {
         try{
@@ -56,6 +59,10 @@ public class SmartRouter {
             logger.info("Data Directory: {}", dataDirectory.toAbsolutePath());
             logger.info("Loading configuration...");
             reloadConfiguration();
+
+            logger.info("Initializating server manager...");
+            serverManager = new ServerManager(configuration);
+
             logger.info("Registering commands...");
             new CommandHandler(this);
             logger.info("Registering events...");
@@ -72,6 +79,10 @@ public class SmartRouter {
     }
 
 
+
+    public ServerManager getServerManager() {
+        return serverManager;
+    }
 
     @Subscribe
     public void onPlayerMOTDPing(ProxyPingEvent event) {

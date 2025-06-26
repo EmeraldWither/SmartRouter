@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.emeraldcraft.smartRouter.SmartRouter;
 import org.emeraldcraft.smartRouter.components.ChildServerConfig;
 import org.emeraldcraft.smartRouter.components.Configuration;
+import org.emeraldcraft.smartRouter.manager.StartResponse;
 import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
 
 import java.util.Optional;
@@ -73,33 +74,17 @@ public class PlayerLoginEvents {
             if(server.isPresent()) {
                 //check for instance state, or start server
                 event.setInitialServer(server.get());
-                String state = Pterodactyl.getServerState(selectedServer, configuration);
-                if (state.equalsIgnoreCase("stopped")) {
-                    if(selectedServer.autoStart()) {
-                        Pterodactyl.startServer(selectedServer, configuration);
-                        SmartRouter.getLogger().info("Starting the server %s!".formatted(selectedServer.displayName()));
-                        event.getPlayer().disconnect(Component.text("You have started the server '%s'".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN));
-                        return;
-                    }
-                    event.getPlayer().disconnect(Component.text("%s is offline, and cannot be automatically started.".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
-                    return;
+                StartResponse startResponse = smartRouter.getServerManager().startServer(selectedServer);
+                if(startResponse == StartResponse.LOGIN_ACCEPTED) {
+                    event.setInitialServer(server.get());
                 }
-                else if (state.equalsIgnoreCase("starting")) {
-                    event.getPlayer().disconnect(Component.text("The server '%s' is still starting.".formatted(selectedServer.displayName())).color(NamedTextColor.GOLD));
+                else {
+                    event.getPlayer().disconnect(Component.text(startResponse.getResponse().formatted(selectedServer.displayName())).color(startResponse.getColor()));
                     return;
                 }
 
 
-                else if (state.equalsIgnoreCase("stopping")) {
-                    SmartRouter.getLogger().info("Server is stopping. Cannot run any actions.");
-                    event.getPlayer().disconnect(Component.text("The server '%s' is stopping, and cannot have actions run on it. Try again in a bit...".formatted(selectedServer.displayName())).color(NamedTextColor.RED));
-                    return;
-                }
 
-                SmartRouter.getLogger().info("Allowed player to connect to %s".formatted(selectedServer.displayName()));
-                event.getPlayer().sendMessage(Component.text("You have been sent to '%s'".formatted(selectedServer.displayName())).color(NamedTextColor.GREEN).decorate(TextDecoration.ITALIC));
-                //stop all instance stop timers
-                Pterodactyl.stopAllTimers();
             }
             else {
                 event.getPlayer().disconnect(Component.text("An invalid configuration was detected. Please contact an admin."));
