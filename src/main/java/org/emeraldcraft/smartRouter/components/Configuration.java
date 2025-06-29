@@ -171,4 +171,8 @@ public class Configuration {
     public void setMaintenance(boolean value) {
         this.maintenance = value;
     }
+
+    public void setMaintenanceMessage(String value) {
+        this.maintenanceMessage = value;
+    }
 }

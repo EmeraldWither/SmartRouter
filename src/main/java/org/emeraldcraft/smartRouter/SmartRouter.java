@@ -87,13 +87,17 @@ public class SmartRouter {
     @Subscribe
     public void onPlayerMOTDPing(ProxyPingEvent event) {
         Optional<Favicon> favicon = server.getConfiguration().getFavicon();
+
+        ServerPing.Version version = event.getPing().getVersion();
+        if(configuration.isMaintenance()) {
+            version = new ServerPing.Version(1, "Under Maintenance");
+        }
         ServerPing.Players players = new ServerPing.Players(1, 1, List.of(new ServerPing.SamplePlayer("EmerqldWither", UUID.randomUUID())));
-        ServerPing ping = new ServerPing(event.getPing().getVersion(), players, buildConfigurationMOTD(configuration), favicon.orElse(null));
+        ServerPing ping = new ServerPing(version, players, buildConfigurationMOTD(configuration), favicon.orElse(null));
         event.setPing(ping);
     }
 
     private static Component buildConfigurationMOTD(Configuration configuration) {
-        String server = configuration.getSelectedServer().displayName();
         return Component.empty().append(Component.text("Emerald", NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD)).append(Component.text("Craft", NamedTextColor.GREEN).append(Component.text(" SmartRouter Proxy", NamedTextColor.GOLD))).decorate().appendNewline()
                 .append(buildCurrentServerMOTD(configuration));
     }

@@ -33,6 +33,7 @@ public class CommandHandler {
                 .then(createStartTimerCommand())
                 .then(createStopTimerCommand())
                 .then(createMaintenanceCommand())
+                .then(createMaintenanceMessageCommand())
                 .then(helpCommand())
                 .build();
         server.getCommandManager().register(meta, new BrigadierCommand(routerCommand));
@@ -149,6 +150,19 @@ public class CommandHandler {
                                     boolean value = Boolean.parseBoolean(StringArgumentType.getString(context, "value"));
                                     smartRouter.getConfiguration().setMaintenance(value);
                                     SmartRouter.getLogger().info("Set the temporary maintenance mode to %s".formatted(value));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                )
+                .build();
+    }
+    private LiteralCommandNode<CommandSource> createMaintenanceMessageCommand() {
+        return BrigadierCommand.literalArgumentBuilder("message")
+                .then(
+                        BrigadierCommand.requiredArgumentBuilder("msg", StringArgumentType.string())
+                                .executes(context -> {
+                                    String value = StringArgumentType.getString(context, "msg");
+                                    smartRouter.getConfiguration().setMaintenanceMessage(value);
+                                    SmartRouter.getLogger().info("Set the temporary maintenance message to to %s".formatted(value));
                                     return Command.SINGLE_SUCCESS;
                                 })
                 )

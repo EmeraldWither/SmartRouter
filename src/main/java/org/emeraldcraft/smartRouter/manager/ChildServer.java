@@ -142,7 +142,6 @@ public class ChildServer {
     }
 
     public void delayedShutdown() {
-
         pteroStopTask = SmartRouter.getProxyServer().getScheduler().buildTask(SmartRouter.getInstance(), this::runPteroStopTask).delay(Duration.ofMinutes(5)).schedule();
     }
     public void shutdownNow() {
@@ -200,7 +199,10 @@ public class ChildServer {
     }
 
     public void cancelStopTimer() {
+        if(pteroStopTask != null) pteroStopTask.cancel();
         if(instanceStopTask != null) instanceStopTask.cancel();
+        pteroStopTask = null;
+        instanceStopTask = null;
         SmartRouter.getLogger().info("Stopped the stop timer for %s".formatted(childServerConfig.displayName()));
     }
 
