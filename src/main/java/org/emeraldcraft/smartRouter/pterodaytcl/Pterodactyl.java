@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -145,7 +146,10 @@ public class Pterodactyl {
             String serverInfo = parseInputStream(http.getInputStream());
             http.disconnect();
             return serverInfo;
-        } catch (IOException var6) {
+        } catch (SocketTimeoutException e) {
+            return "\"detail\": \"Could not establish a connection to the machine running this server. Please try again.\"";
+        }
+        catch (IOException var6) {
             throw new RuntimeException(var6);
         }
     }
