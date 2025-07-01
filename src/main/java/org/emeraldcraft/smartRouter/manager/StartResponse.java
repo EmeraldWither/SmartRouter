@@ -4,9 +4,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
 public enum StartResponse {
-    SUCCESS("You have started %s", NamedTextColor.GREEN),
+    SUCCESS("You have started %s. Good boy.", NamedTextColor.GREEN),
     ALREADY_STOPPING("The server %s is stopping, so you cannot perform actions right now. Please wait a moment.", NamedTextColor.YELLOW),
-    ALREADY_STARTING("The server %s is still starting up.", NamedTextColor.YELLOW),
+    ALREADY_STARTING("The server %s is still starting up. Bad boy.", NamedTextColor.YELLOW),
     ERROR_ADMIN("ERROR. Something is not okay-dokie and should probably contact the admin (i think you should).", NamedTextColor.RED),
     LOGIN_ACCEPTED("Login accepted?", NamedTextColor.WHITE);
 
