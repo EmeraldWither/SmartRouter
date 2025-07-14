@@ -1,4 +1,4 @@
-package org.emeraldcraft.smartRouter.manager;
+package org.emeraldcraft.smartrouter.manager;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;

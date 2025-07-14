@@ -1,4 +1,4 @@
-package org.emeraldcraft.smartRouter;
+package org.emeraldcraft.smartrouter;
 
 // The constants are replaced before compilation
 public class BuildConstants {

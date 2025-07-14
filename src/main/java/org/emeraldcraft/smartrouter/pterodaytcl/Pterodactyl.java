@@ -1,11 +1,11 @@
-package org.emeraldcraft.smartRouter.pterodaytcl;
+package org.emeraldcraft.smartrouter.pterodaytcl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import org.emeraldcraft.smartRouter.SmartRouter;
-import org.emeraldcraft.smartRouter.components.ChildServerConfig;
-import org.emeraldcraft.smartRouter.components.Configuration;
+import org.emeraldcraft.smartrouter.SmartRouter;
+import org.emeraldcraft.smartrouter.components.ChildServerConfig;
+import org.emeraldcraft.smartrouter.components.Configuration;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusResponse;

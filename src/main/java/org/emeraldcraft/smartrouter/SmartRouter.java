@@ -1,4 +1,4 @@
-package org.emeraldcraft.smartRouter;
+package org.emeraldcraft.smartrouter;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -12,21 +12,19 @@ import com.velocitypowered.api.util.Favicon;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.emeraldcraft.smartRouter.components.Configuration;
-import org.emeraldcraft.smartRouter.events.PlayerLeaveEvents;
-import org.emeraldcraft.smartRouter.events.PlayerLoginEvents;
-import org.emeraldcraft.smartRouter.manager.ServerManager;
-import org.jetbrains.annotations.NotNull;
+import org.emeraldcraft.smartrouter.components.Configuration;
+import org.emeraldcraft.smartrouter.events.PlayerLeaveEvents;
+import org.emeraldcraft.smartrouter.events.PlayerLoginEvents;
+import org.emeraldcraft.smartrouter.manager.ServerManager;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurateException;
-import webserver.ServerIDProvider;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Plugin(id = "smartrouter", name = "SmartRouter", authors = "EmerqldWither", version = BuildConstants.VERSION, description = "Smart Router for EmeraldCraft Servers")
+@Plugin(id = "smartrouter", name = "SmartRouter", authors = "EmerqldWither", version = org.emeraldcraft.smartrouter.BuildConstants.VERSION, description = "Smart Router for EmeraldCraft Servers")
 public class SmartRouter {
 
     @Inject
@@ -44,8 +42,6 @@ public class SmartRouter {
     private Path dataDirectory;
 
     private Configuration configuration;
-
-    private ServerIDProvider serverIDProvider;
 
     private ServerManager serverManager;
 
@@ -68,9 +64,6 @@ public class SmartRouter {
             logger.info("Registering events...");
             server.getEventManager().register(this, new PlayerLoginEvents(this));
             server.getEventManager().register(this, new PlayerLeaveEvents(this));
-            logger.info("Creating the webserver...");
-            serverIDProvider = new ServerIDProvider();
-            serverIDProvider.init();
 
             logger.info("SmartRouter has been initialized!");
         } catch (Exception e) {

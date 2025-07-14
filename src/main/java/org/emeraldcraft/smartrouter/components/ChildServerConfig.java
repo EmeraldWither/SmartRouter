@@ -1,4 +1,4 @@
-package org.emeraldcraft.smartRouter.components;
+package org.emeraldcraft.smartrouter.components;
 
 import org.jetbrains.annotations.NotNull;
 

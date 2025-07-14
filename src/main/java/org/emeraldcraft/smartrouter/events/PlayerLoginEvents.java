@@ -1,4 +1,4 @@
-package org.emeraldcraft.smartRouter.events;
+package org.emeraldcraft.smartrouter.events;
 
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
@@ -8,12 +8,10 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.emeraldcraft.smartRouter.SmartRouter;
-import org.emeraldcraft.smartRouter.components.ChildServerConfig;
-import org.emeraldcraft.smartRouter.components.Configuration;
-import org.emeraldcraft.smartRouter.manager.StartResponse;
-import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
+import org.emeraldcraft.smartrouter.SmartRouter;
+import org.emeraldcraft.smartrouter.components.ChildServerConfig;
+import org.emeraldcraft.smartrouter.components.Configuration;
+import org.emeraldcraft.smartrouter.manager.StartResponse;
 
 import java.util.Optional;
 

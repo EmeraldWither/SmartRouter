@@ -1,6 +1,6 @@
-package org.emeraldcraft.smartRouter.components;
+package org.emeraldcraft.smartrouter.components;
 
-import org.emeraldcraft.smartRouter.SmartRouter;
+import org.emeraldcraft.smartrouter.SmartRouter;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -174,5 +174,9 @@ public class Configuration {
 
     public void setMaintenanceMessage(String value) {
         this.maintenanceMessage = value;
+    }
+
+    public void setServer(ChildServerConfig childServerConfig) {
+        selectedServer = childServerConfig;
     }
 }

@@ -1,4 +1,4 @@
-package org.emeraldcraft.smartRouter.manager;
+package org.emeraldcraft.smartrouter.manager;
 
 public enum ServerState {
     UNKNOWN,

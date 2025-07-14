@@ -1,4 +1,4 @@
-package org.emeraldcraft.smartRouter;
+package org.emeraldcraft.smartrouter;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -9,8 +9,7 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
-import org.emeraldcraft.smartRouter.components.ChildServerConfig;
-import org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl;
+import org.emeraldcraft.smartrouter.components.ChildServerConfig;
 
 public class CommandHandler {
 
@@ -34,6 +33,7 @@ public class CommandHandler {
                 .then(createStopTimerCommand())
                 .then(createMaintenanceCommand())
                 .then(createMaintenanceMessageCommand())
+                .then(createSetServerCommand())
                 .then(helpCommand())
                 .build();
         server.getCommandManager().register(meta, new BrigadierCommand(routerCommand));
@@ -43,8 +43,8 @@ public class CommandHandler {
     private LiteralArgumentBuilder<CommandSource> helpCommand() {
         return BrigadierCommand.literalArgumentBuilder("help")
                 .executes(context -> {
-                    SmartRouter.getProxyServer().sendMessage(
-                            Component.text("list - list servers ; reload - reload config; startserver [name] - starts the server ; stopserver [name] - stops the server; maintenance [true/false] - temporarily sets the maintenance value until the next reboot ; starttimer - starts the stop timers to stop the instances ; canceltimer - stops the stop timers do the server does not shut down")
+                    context.getSource().sendMessage(
+                            Component.text("list - list servers ; reload - reload config; startserver [name] - starts the server ; stopserver [name] - stops the server; maintenance [true/false] - temporarily sets the maintenance value until the next reboot ; starttimer - starts the stop timers to stop the instances ; canceltimer - stops the stop timers do the server does not shut down ; setserver [config_name] - sets the current selected server to this server")
                     );
                     return Command.SINGLE_SUCCESS;
                 });
@@ -93,7 +93,7 @@ public class CommandHandler {
                                             String serverName = StringArgumentType.getString(context, "name");
                                             ChildServerConfig server = smartRouter.getConfiguration().childServerFromName(serverName);
                                             SmartRouter.getInstance().getServerManager().startServer(server);
-                                            SmartRouter.getProxyServer().sendMessage(Component.text("Starting server..."));
+                                            context.getSource().sendMessage(Component.text("Starting server..."));
                                             return Command.SINGLE_SUCCESS;
                                         }
                                 )
@@ -108,6 +108,7 @@ public class CommandHandler {
                                             String serverName = StringArgumentType.getString(context, "name");
                                             ChildServerConfig server = smartRouter.getConfiguration().childServerFromName(serverName);
                                             smartRouter.getServerManager().shutdownServerNow(server);
+                                            context.getSource().sendMessage(Component.text("Stopping server..."));
                                             return Command.SINGLE_SUCCESS;
                                         }
                                 )
@@ -163,6 +164,21 @@ public class CommandHandler {
                                     String value = StringArgumentType.getString(context, "msg");
                                     smartRouter.getConfiguration().setMaintenanceMessage(value);
                                     SmartRouter.getLogger().info("Set the temporary maintenance message to to %s".formatted(value));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                )
+                .build();
+    }
+
+    private LiteralCommandNode<CommandSource> createSetServerCommand() {
+        return BrigadierCommand.literalArgumentBuilder("setserver")
+                .then(
+                        BrigadierCommand.requiredArgumentBuilder("value", StringArgumentType.word())
+                                .executes(context -> {
+                                    String value = StringArgumentType.getString(context, "value");
+                                    ChildServerConfig childServerConfig = smartRouter.getConfiguration().childServerFromName(value);
+                                    smartRouter.getConfiguration().setServer(childServerConfig);
+                                    context.getSource().sendMessage(Component.text("Switched the active server to %s".formatted(childServerConfig.displayName())));
                                     return Command.SINGLE_SUCCESS;
                                 })
                 )

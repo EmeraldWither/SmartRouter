@@ -1,10 +1,10 @@
-package org.emeraldcraft.smartRouter.manager.aws;
+package org.emeraldcraft.smartrouter.manager.aws;
 
-import org.emeraldcraft.smartRouter.SmartRouter;
-import org.emeraldcraft.smartRouter.components.ChildServerConfig;
-import org.emeraldcraft.smartRouter.components.Configuration;
-import org.emeraldcraft.smartRouter.manager.ChildServer;
-import org.emeraldcraft.smartRouter.manager.ServerState;
+import org.emeraldcraft.smartrouter.SmartRouter;
+import org.emeraldcraft.smartrouter.components.ChildServerConfig;
+import org.emeraldcraft.smartrouter.components.Configuration;
+import org.emeraldcraft.smartrouter.manager.ChildServer;
+import org.emeraldcraft.smartrouter.manager.ServerState;
 
 import java.util.ArrayList;
 import java.util.List;

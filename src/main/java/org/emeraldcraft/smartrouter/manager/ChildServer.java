@@ -1,11 +1,11 @@
-package org.emeraldcraft.smartRouter.manager;
+package org.emeraldcraft.smartrouter.manager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import org.emeraldcraft.smartRouter.SmartRouter;
-import org.emeraldcraft.smartRouter.components.ChildServerConfig;
-import org.emeraldcraft.smartRouter.components.Configuration;
+import org.emeraldcraft.smartrouter.SmartRouter;
+import org.emeraldcraft.smartrouter.components.ChildServerConfig;
+import org.emeraldcraft.smartrouter.components.Configuration;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.StartInstancesRequest;
 import software.amazon.awssdk.services.ec2.model.StopInstancesRequest;
@@ -16,11 +16,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLOutput;
 import java.time.Duration;
 
-import static org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl.getInstanceState;
-import static org.emeraldcraft.smartRouter.pterodaytcl.Pterodactyl.getResponse;
+import static org.emeraldcraft.smartrouter.pterodaytcl.Pterodactyl.getInstanceState;
+import static org.emeraldcraft.smartrouter.pterodaytcl.Pterodactyl.getResponse;
 
 public class ChildServer {
     private final ChildServerConfig childServerConfig;

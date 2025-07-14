@@ -1,8 +1,8 @@
-package org.emeraldcraft.smartRouter.events;
+package org.emeraldcraft.smartrouter.events;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
-import org.emeraldcraft.smartRouter.SmartRouter;
+import org.emeraldcraft.smartrouter.SmartRouter;
 
 public class PlayerLeaveEvents {
     private final SmartRouter smartRouter;
