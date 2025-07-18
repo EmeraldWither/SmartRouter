@@ -16,7 +16,7 @@ public class PlayerBookTask implements Runnable {
 
     @Override
     public void run() {
-        Book book = ItemBuilder.buildBook(frames[frame]);
+        Book book = ItemBuilder.buildBook();
         frame = (frame + 1) % frames.length;
         player.openBook(book);
     }
