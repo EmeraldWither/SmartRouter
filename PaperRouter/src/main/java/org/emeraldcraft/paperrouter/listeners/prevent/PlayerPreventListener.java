@@ -1,4 +1,4 @@
-package org.emeraldcraft.paperRouter.listeners.prevent;
+package org.emeraldcraft.paperrouter.listeners.prevent;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

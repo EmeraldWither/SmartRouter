@@ -1,4 +1,4 @@
-package org.emeraldcraft.paperRouter;
+package org.emeraldcraft.paperrouter.book;
 
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
@@ -10,6 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.emeraldcraft.paperrouter.PaperRouter;
+import org.emeraldcraft.paperrouter.serverapi.components.ChildServerConfig;
+import org.emeraldcraft.paperrouter.serverapi.manager.ChildServer;
+import org.emeraldcraft.paperrouter.serverapi.manager.ServerManager;
 
 public class ItemBuilder {
     public static final byte COMPASS_KEY = 0x11;
@@ -22,7 +26,7 @@ public class ItemBuilder {
         return itemStack;
     }
 
-    public static Book buildBook() {
+    public static Book buildBook(ServerBookBuilder builder) {
 
         Component page = Component.empty()
         .append(
@@ -31,8 +35,14 @@ public class ItemBuilder {
                 Component.text("Craft").color(NamedTextColor.GREEN)
         )
         .appendNewline()
-        .append(Component.text("==================="));
-
+        .append(Component.text("==================="))
+        .appendNewline()
+        .append(Component.text("(Click on a server to start)").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
+        .appendNewline();
+        for (ChildServerConfig configuredChildServer : PaperRouter.getConfiguration().getConfiguredChildServers()) {
+            ChildServer server = PaperRouter.getServerManager().fromConfig(configuredChildServer);
+            page = page.append(builder.forServer(server)).appendNewline();
+        }
         return Book.book(Component.empty(), Component.empty(), page);
     }
 

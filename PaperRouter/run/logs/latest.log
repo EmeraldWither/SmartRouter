@@ -1,51 +1,76 @@
-[21:23:29] [ServerMain/INFO]: [bootstrap] Running Java 21 (OpenJDK 64-Bit Server VM 21.0.8+9-LTS; Azul Systems, Inc. Zulu21.44+17-CA) on Windows 11 10.0 (amd64)
-[21:23:29] [ServerMain/INFO]: [bootstrap] Loading Paper 1.21.6-48-main@4d854e6 (2025-06-30T09:48:37Z) for Minecraft 1.21.6
-[21:23:30] [ServerMain/INFO]: [PluginInitializerManager] Initializing plugins...
-[21:23:30] [Paper Plugin Remapper Thread - 2/INFO]: [PluginRemapper] Remapping plugin 'C:\Users\Ishaan\Programming Projects\IntelliJ\SmartRouter\PaperRouter\build\libs\PaperRouter-3.0-beta-1.jar'...
-[21:23:30] [Paper Plugin Remapper Thread - 2/INFO]: [PluginRemapper] Done remapping plugin 'C:\Users\Ishaan\Programming Projects\IntelliJ\SmartRouter\PaperRouter\build\libs\PaperRouter-3.0-beta-1.jar' in 385ms.
-[21:23:31] [ServerMain/INFO]: [PluginInitializerManager] Initialized 1 plugin
-[21:23:31] [ServerMain/INFO]: [PluginInitializerManager] Bukkit plugins (1):
+[23:19:18] [ServerMain/INFO]: [bootstrap] Running Java 21 (OpenJDK 64-Bit Server VM 21.0.8+9-LTS; Azul Systems, Inc. Zulu21.44+17-CA) on Windows 11 10.0 (amd64)
+[23:19:18] [ServerMain/INFO]: [bootstrap] Loading Paper 1.21.6-48-main@4d854e6 (2025-06-30T09:48:37Z) for Minecraft 1.21.6
+[23:19:19] [ServerMain/INFO]: [PluginInitializerManager] Initializing plugins...
+[23:19:20] [Paper Plugin Remapper Thread - 1/INFO]: [PluginRemapper] Remapping plugin 'C:\Users\Ishaan\Programming Projects\IntelliJ\SmartRouter\PaperRouter\build\libs\PaperRouter-3.0-beta-1-all.jar'...
+[23:19:26] [Paper Plugin Remapper Thread - 1/INFO]: [PluginRemapper] Done remapping plugin 'C:\Users\Ishaan\Programming Projects\IntelliJ\SmartRouter\PaperRouter\build\libs\PaperRouter-3.0-beta-1-all.jar' in 6934ms.
+[23:19:27] [ServerMain/INFO]: [PluginInitializerManager] Initialized 1 plugin
+[23:19:27] [ServerMain/INFO]: [PluginInitializerManager] Bukkit plugins (1):
  - PaperRouter (3.0-beta-1)
-[21:23:34] [ServerMain/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
-[21:23:36] [ServerMain/INFO]: Loaded 1407 recipes
-[21:23:36] [ServerMain/INFO]: Loaded 1520 advancements
-[21:23:36] [ServerMain/INFO]: [ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry] Initialising converters for DataConverter...
-[21:23:36] [ServerMain/INFO]: [ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry] Finished initialising converters for DataConverter in 375.1ms
-[21:23:37] [Server thread/INFO]: Starting minecraft server version 1.21.6
-[21:23:37] [Server thread/INFO]: Loading properties
-[21:23:37] [Server thread/INFO]: This server is running Paper version 1.21.6-48-main@4d854e6 (2025-06-30T09:48:37Z) (Implementing API version 1.21.6-R0.1-SNAPSHOT)
-[21:23:37] [Server thread/INFO]: [spark] This server bundles the spark profiler. For more information please visit https://docs.papermc.io/paper/profiling
-[21:23:37] [Server thread/INFO]: Using 4 threads for Netty based IO
-[21:23:37] [Server thread/INFO]: Server Ping Player Sample Count: 12
-[21:23:37] [Server thread/INFO]: [MoonriseCommon] Paper is using 4 worker threads, 1 I/O threads
-[21:23:37] [Server thread/INFO]: [ChunkTaskScheduler] Chunk system is using population gen parallelism: true
-[21:23:37] [Server thread/INFO]: Default game type: SURVIVAL
-[21:23:37] [Server thread/INFO]: Generating keypair
-[21:23:37] [Server thread/INFO]: Starting Minecraft server on *:25565
-[21:23:38] [Server thread/INFO]: Using default channel type
-[21:23:38] [Server thread/INFO]: Paper: Using Java compression from Velocity.
-[21:23:38] [Server thread/INFO]: Paper: Using Java cipher from Velocity.
-[21:23:38] [Server thread/INFO]: [PaperRouter] Loading server plugin PaperRouter v3.0-beta-1
-[21:23:38] [Server thread/INFO]: Server permissions file permissions.yml is empty, ignoring it
-[21:23:38] [Server thread/INFO]: Preparing level "world"
-[21:23:38] [Server thread/INFO]: Preparing start region for dimension minecraft:overworld
-[21:23:39] [Server thread/INFO]: Preparing spawn area: 0%
-[21:23:39] [Server thread/INFO]: Preparing spawn area: 0%
-[21:23:39] [Server thread/INFO]: Time elapsed: 772 ms
-[21:23:39] [Server thread/INFO]: Preparing start region for dimension minecraft:the_nether
-[21:23:39] [Server thread/INFO]: Preparing spawn area: 0%
-[21:23:39] [Server thread/INFO]: Time elapsed: 75 ms
-[21:23:39] [Server thread/INFO]: Preparing start region for dimension minecraft:the_end
-[21:23:39] [Server thread/INFO]: Preparing spawn area: 0%
-[21:23:39] [Server thread/INFO]: Time elapsed: 53 ms
-[21:23:39] [Server thread/INFO]: [PaperRouter] Enabling PaperRouter v3.0-beta-1
-[21:23:39] [Server thread/INFO]: [spark] Starting background profiler...
-[21:23:39] [Server thread/INFO]: [spark] The async-profiler engine is not supported for your os/arch (windows11/amd64), so the built-in Java engine will be used instead.
-[21:23:39] [Server thread/INFO]: Done preparing level "world" (1.714s)
-[21:23:39] [Server thread/INFO]: Running delayed init tasks
-[21:23:39] [Server thread/INFO]: Done (10.817s)! For help, type "help"
-[21:23:47] [User Authenticator #0/INFO]: UUID of player EmerqldWither is 0c5390b1-a7cd-4fe0-8309-baf977a9ed20
-[21:23:47] [Server thread/INFO]: EmerqldWither joined the game
-[21:23:47] [Server thread/INFO]: EmerqldWither[/127.0.0.1:57062] logged in with entity id 68 at ([world]15.5, 69.0, -85.5)
-[21:24:54] [Server thread/INFO]: EmerqldWither lost connection: Disconnected
-[21:24:54] [Server thread/INFO]: EmerqldWither left the game
+[23:19:35] [ServerMain/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[23:19:39] [ServerMain/INFO]: Loaded 1407 recipes
+[23:19:39] [ServerMain/INFO]: Loaded 1520 advancements
+[23:19:39] [ServerMain/INFO]: [ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry] Initialising converters for DataConverter...
+[23:19:40] [ServerMain/INFO]: [ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry] Finished initialising converters for DataConverter in 880.8ms
+[23:19:40] [Server thread/INFO]: Starting minecraft server version 1.21.6
+[23:19:40] [Server thread/INFO]: Loading properties
+[23:19:40] [Server thread/INFO]: This server is running Paper version 1.21.6-48-main@4d854e6 (2025-06-30T09:48:37Z) (Implementing API version 1.21.6-R0.1-SNAPSHOT)
+[23:19:40] [Server thread/INFO]: [spark] This server bundles the spark profiler. For more information please visit https://docs.papermc.io/paper/profiling
+[23:19:40] [Server thread/INFO]: Server Ping Player Sample Count: 12
+[23:19:40] [Server thread/INFO]: Using 4 threads for Netty based IO
+[23:19:41] [Server thread/INFO]: [MoonriseCommon] Paper is using 4 worker threads, 1 I/O threads
+[23:19:41] [Server thread/INFO]: [ChunkTaskScheduler] Chunk system is using population gen parallelism: true
+[23:19:41] [Server thread/INFO]: Default game type: SURVIVAL
+[23:19:41] [Server thread/INFO]: Generating keypair
+[23:19:42] [Server thread/INFO]: Starting Minecraft server on *:25565
+[23:19:42] [Server thread/INFO]: Using default channel type
+[23:19:42] [Server thread/INFO]: Paper: Using Java compression from Velocity.
+[23:19:42] [Server thread/INFO]: Paper: Using Java cipher from Velocity.
+[23:19:42] [Server thread/INFO]: [PaperRouter] Loading server plugin PaperRouter v3.0-beta-1
+[23:19:42] [Server thread/INFO]: Server permissions file permissions.yml is empty, ignoring it
+[23:19:42] [Server thread/INFO]: Preparing level "world"
+[23:19:43] [Server thread/INFO]: Preparing start region for dimension minecraft:overworld
+[23:19:43] [Server thread/INFO]: Preparing spawn area: 0%
+[23:19:44] [Server thread/INFO]: Preparing spawn area: 0%
+[23:19:44] [Server thread/INFO]: Preparing spawn area: 0%
+[23:19:44] [Server thread/INFO]: Time elapsed: 1278 ms
+[23:19:44] [Server thread/INFO]: Preparing start region for dimension minecraft:the_nether
+[23:19:44] [Server thread/INFO]: Preparing spawn area: 0%
+[23:19:44] [Server thread/INFO]: Time elapsed: 188 ms
+[23:19:44] [Server thread/INFO]: Preparing start region for dimension minecraft:the_end
+[23:19:44] [Server thread/INFO]: Preparing spawn area: 0%
+[23:19:44] [Server thread/INFO]: Time elapsed: 124 ms
+[23:19:44] [Server thread/INFO]: [PaperRouter] Enabling PaperRouter v3.0-beta-1
+[23:19:44] [Server thread/INFO]: [PaperRouter] Successfully loaded configuration
+[23:19:44] [Server thread/INFO]: [PaperRouter] Configuration Information
+
+Maintenance: true
+Maintenance Message: [ADMIN] FIX CONFIGURATION
+
+Selected Server: Sample World 1
+Configured Servers: [Sample World 1, Sample World 2]
+Allowlist: [0c5390b1-a7cd-4fe0-8309-baf977a9ed20, DEFG, HIJK]
+
+[23:19:45] [Server thread/ERROR]: Error occurred while enabling PaperRouter v3.0-beta-1 (Is it up to date?)
+java.lang.NullPointerException: Cannot invoke "software.amazon.awssdk.services.ec2.Ec2Client.describeInstanceStatus(software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusRequest)" because "ec2Client" is null
+	at PaperRouter-3.0-beta-1-all-1752895159991.jar/org.emeraldcraft.paperrouter.serverapi.pterodaytcl.Pterodactyl.getInstanceState(Pterodactyl.java:134) ~[PaperRouter-3.0-beta-1-all-1752895159991.jar:?]
+	at PaperRouter-3.0-beta-1-all-1752895159991.jar/org.emeraldcraft.paperrouter.serverapi.manager.ChildServer.fetchData(ChildServer.java:41) ~[PaperRouter-3.0-beta-1-all-1752895159991.jar:?]
+	at PaperRouter-3.0-beta-1-all-1752895159991.jar/org.emeraldcraft.paperrouter.serverapi.manager.ServerManager.<init>(ServerManager.java:17) ~[PaperRouter-3.0-beta-1-all-1752895159991.jar:?]
+	at PaperRouter-3.0-beta-1-all-1752895159991.jar/org.emeraldcraft.paperrouter.PaperRouter.onEnable(PaperRouter.java:29) ~[PaperRouter-3.0-beta-1-all-1752895159991.jar:?]
+	at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:280) ~[paper-api-1.21.6-R0.1-SNAPSHOT.jar:?]
+	at io.papermc.paper.plugin.manager.PaperPluginInstanceManager.enablePlugin(PaperPluginInstanceManager.java:202) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at io.papermc.paper.plugin.manager.PaperPluginManagerImpl.enablePlugin(PaperPluginManagerImpl.java:109) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at org.bukkit.plugin.SimplePluginManager.enablePlugin(SimplePluginManager.java:520) ~[paper-api-1.21.6-R0.1-SNAPSHOT.jar:?]
+	at org.bukkit.craftbukkit.CraftServer.enablePlugin(CraftServer.java:651) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at org.bukkit.craftbukkit.CraftServer.enablePlugins(CraftServer.java:607) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at net.minecraft.server.MinecraftServer.loadWorld0(MinecraftServer.java:743) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at net.minecraft.server.MinecraftServer.loadLevel(MinecraftServer.java:488) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at net.minecraft.server.dedicated.DedicatedServer.initServer(DedicatedServer.java:280) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:1164) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:310) ~[paper-1.21.6.jar:1.21.6-48-4d854e6]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
+[23:19:45] [Server thread/INFO]: [PaperRouter] Disabling PaperRouter v3.0-beta-1
+[23:19:45] [Server thread/INFO]: [spark] Starting background profiler...
+[23:19:45] [Server thread/INFO]: [spark] The async-profiler engine is not supported for your os/arch (windows11/amd64), so the built-in Java engine will be used instead.
+[23:19:45] [Server thread/INFO]: Done preparing level "world" (3.244s)
+[23:19:45] [Server thread/INFO]: Running delayed init tasks
+[23:19:45] [Server thread/INFO]: Done (27.788s)! For help, type "help"
