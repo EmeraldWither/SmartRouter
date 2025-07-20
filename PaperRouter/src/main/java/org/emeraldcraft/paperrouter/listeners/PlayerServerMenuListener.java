@@ -3,6 +3,7 @@ package org.emeraldcraft.paperrouter.listeners;
 import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,6 +31,7 @@ public class PlayerServerMenuListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         event.getPlayer().setGameMode(GameMode.SPECTATOR);
         event.getPlayer().setFlying(true);
+        event.getPlayer().teleport(new Location(event.getPlayer().getWorld(), 0, -64, 0));
         var task = Bukkit.getScheduler().runTaskTimer(JavaPlugin.getProvidingPlugin(PaperRouter.class), new PlayerBookTask(event.getPlayer()), 0, 2);
         tasks.put(event.getPlayer(), task);
     }

@@ -41,17 +41,21 @@ public class PlayerBookTask implements Runnable {
             server.fetchWithDelay(2);
             SimpleServerState state = SimpleServerState.fromServerState(server.getServerState());
 
-            if(state == SimpleServerState.OFFLINE || (state == SimpleServerState.STARTING && !server.isStarting())) {
+            if((state == SimpleServerState.OFFLINE && !server.isStarting()) || (state == SimpleServerState.STARTING && !server.isStarting())) {
                 text = Component.text("• ").color(NamedTextColor.RED).append(text);
                 serverStateText = "Offline";
             }
-            else if(state == SimpleServerState.STARTING && server.isStarting()){
+            else if((state == SimpleServerState.STARTING && server.isStarting()) || (state == SimpleServerState.OFFLINE && server.isStarting())){
                 text = Component.text(LOADING_ANIM[(int) (Math.random() * 2)] + " ").color(NamedTextColor.GOLD).append(text.decorate(TextDecoration.ITALIC));
                 serverStateText = "Starting";
             }
             else if(state == SimpleServerState.ONLINE) {
                 text = Component.text("✔ ").color(NamedTextColor.DARK_GREEN).append(text.decorate(TextDecoration.BOLD));
                 serverStateText = "Online";
+            }
+            else if(state == SimpleServerState.STOPPING) {
+                text = Component.text("\uD83D\uDED1").color(NamedTextColor.LIGHT_PURPLE).append(text);
+                serverStateText = "Stopping";
             }
             else if (state == SimpleServerState.UNKNOWN) {
                 text = Component.text("(?)").color(NamedTextColor.DARK_GRAY).append(text);

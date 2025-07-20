@@ -16,6 +16,7 @@ public class PlayerLeaveEvents {
     @Subscribe
     public void onPlayerLeave(DisconnectEvent event) {
         RegisteredServer server = lastServer.get(event.getPlayer());
+        if(server == null) return;
         if(server.getServerInfo().getName().equals("limbo")) return;
         if(server.getPlayersConnected().isEmpty()) {
             VelocityRouter.getLogger().info("Everyone has left that server. Starting the stop timer.");

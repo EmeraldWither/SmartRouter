@@ -37,6 +37,7 @@ public class Instance {
             }
         }
 
+        VelocityRouter.getLogger().info("Shutting down instance " + instanceID + "!");
         VelocityRouter.getConfiguration().getEc2Client().stopInstances(StopInstancesRequest.builder().instanceIds(instanceID).build());
     }
 }

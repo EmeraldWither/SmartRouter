@@ -140,7 +140,7 @@ public class ChildServer {
     }
 
     public void delayedShutdown() {
-        pteroStopTask = VelocityRouter.getProxyServer().getScheduler().buildTask(VelocityRouter.getInstance(), this::runPteroStopTask).delay(Duration.ofSeconds(15)).schedule();
+        pteroStopTask = VelocityRouter.getProxyServer().getScheduler().buildTask(VelocityRouter.getInstance(), this::runPteroStopTask).delay(Duration.ofMinutes(5)).schedule();
     }
     public void shutdownNow() {
         fetchData();

@@ -1,9 +1,14 @@
 package org.emeraldcraft.paperrouter.book;
 
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -14,6 +19,9 @@ import org.emeraldcraft.paperrouter.PaperRouter;
 import org.emeraldcraft.paperrouter.serverapi.components.ChildServerConfig;
 import org.emeraldcraft.paperrouter.serverapi.manager.ChildServer;
 import org.emeraldcraft.paperrouter.serverapi.manager.ServerManager;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class ItemBuilder {
     public static final byte COMPASS_KEY = 0x11;
@@ -43,6 +51,14 @@ public class ItemBuilder {
             ChildServer server = PaperRouter.getServerManager().fromConfig(configuredChildServer);
             page = page.append(builder.forServer(server)).appendNewline();
         }
+        page = page.appendNewline()
+                .append(Component.text("[Disconnect]").hoverEvent(HoverEvent.showText(Component.text("Click to leave").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))).clickEvent(ClickEvent.callback(audience -> {
+                    Optional<UUID> uuid = audience.get(Identity.UUID);
+                    if(uuid.isEmpty()) return;
+                    Player player = Bukkit.getPlayer(uuid.get());
+                    if(player == null) return;
+                    player.kick(Component.text("You have been disconnected from EmeraldCraft"));
+                })));
         return Book.book(Component.empty(), Component.empty(), page);
     }
 

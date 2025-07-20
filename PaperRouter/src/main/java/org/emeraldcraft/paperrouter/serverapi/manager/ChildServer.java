@@ -132,6 +132,7 @@ public class ChildServer {
         } else if (serverState == ServerState.SERVER_OFFLINE) {
             if(startTask == null) {
                 starting = true;
+                System.out.println("Running ptero start task");
                 runPteroStartTask();
             }
             return StartResponse.ALREADY_STARTING;
@@ -168,7 +169,7 @@ public class ChildServer {
 
 
     private void runPteroStartTask() {
-        startTask = Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(PaperRouter.class), () -> {
+        startTask = Bukkit.getScheduler().runTaskTimer(JavaPlugin.getProvidingPlugin(PaperRouter.class), () -> {
             //get the new server state
             fetchNow();
             if(serverState == ServerState.SERVER_OFFLINE) {
@@ -192,7 +193,7 @@ public class ChildServer {
             }
 
 
-        }, 20 * 2);
+        }, 0, 20 * 2);
     }
     private void runPteroStopTask() {
         sendPteroPowerCommand(childServerConfig, PaperRouter.getConfiguration(), "stop");
