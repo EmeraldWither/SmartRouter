@@ -19,7 +19,7 @@ public class PluginChannelListener {
         System.out.println(new String(event.getData(), Charset.defaultCharset()));
         if(event.getIdentifier().getId().equals("router")) {
             String name = new String(event.getData(), Charset.defaultCharset());
-            server.getAllPlayers().stream().findFirst().get().
+
         }
     }
 
