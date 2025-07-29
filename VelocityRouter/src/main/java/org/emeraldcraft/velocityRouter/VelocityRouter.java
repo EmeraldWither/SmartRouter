@@ -2,7 +2,6 @@ package org.emeraldcraft.velocityRouter;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandMeta;
-import com.velocitypowered.api.command.RawCommand;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
@@ -16,14 +15,12 @@ import com.velocitypowered.api.util.Favicon;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.emeraldcraft.velocityRouter.serverapi.InstanceManager;
 import org.emeraldcraft.velocityRouter.serverapi.components.Configuration;
 import org.emeraldcraft.velocityRouter.serverapi.components.ServerManager;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurateException;
-import org.w3c.dom.Text;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -56,7 +53,7 @@ public class VelocityRouter {
         configuration.load();
         manager = new ServerManager(configuration);
         instanceManager = new InstanceManager();
-        getProxyServer().getEventManager().register(this, new PlayerLeaveEvents());
+        getProxyServer().getEventManager().register(this, new PlayerConnectionEvents());
 
         CommandMeta lobby = getProxyServer().getCommandManager().metaBuilder("lobby").plugin(this).build();
         CommandMeta shout = getProxyServer().getCommandManager().metaBuilder("shout").plugin(this).build();

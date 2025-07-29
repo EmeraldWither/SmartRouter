@@ -142,6 +142,7 @@ public class ChildServer {
             return StartResponse.ALREADY_STARTING;
         }
         if(serverState == ServerState.SERVER_STOPPING) {
+            starting = false;
             return StartResponse.ALREADY_STOPPING;
         }
         if(serverState == ServerState.SERVER_ONLINE) {

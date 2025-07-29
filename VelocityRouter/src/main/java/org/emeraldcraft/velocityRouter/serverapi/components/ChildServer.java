@@ -145,7 +145,7 @@ public class ChildServer {
     public void shutdownNow() {
         fetchData();
         if(serverState == ServerState.SERVER_ONLINE) {
-            sendPteroPowerCommand(childServerConfig, VelocityRouter.getInstance().getConfiguration(), "stop");
+            sendPteroPowerCommand(childServerConfig, VelocityRouter.getConfiguration(), "stop");
             runPteroStopTask();
         }
         if(serverState == ServerState.SERVER_OFFLINE) {
