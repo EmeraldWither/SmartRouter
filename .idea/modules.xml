@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/PaperRouter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/PaperRouter.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SmartRouter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SmartRouter.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/VelocityRouter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/VelocityRouter.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.emeraldcraft.SmartRouter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/org.emeraldcraft.SmartRouter.main.iml" />
     </modules>
   </component>
 </project>

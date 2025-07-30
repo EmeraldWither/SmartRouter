@@ -1,10 +1,12 @@
 package org.emeraldcraft.paperrouter.listeners.prevent;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class PlayerPreventListener implements Listener {
@@ -29,5 +31,9 @@ public class PlayerPreventListener implements Listener {
     @EventHandler
     public void onChat(AsyncChatEvent event) {
         event.setCancelled(true);
+    }
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        e.joinMessage(Component.empty());
     }
 }

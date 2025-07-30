@@ -42,8 +42,8 @@ public class PlayerConnectionEvents {
         lastServer.put(event.getPlayer(), event.getServer());
         if(event.getPreviousServer().isPresent()) {
             RegisteredServer registeredServer = event.getPreviousServer().get();
-            if(!registeredServer.getServerInfo().getName().equals("limbo")) {
-                ChildServerConfig config = VelocityRouter.getConfiguration().childServerFromName(registeredServer.getServerInfo().getName());
+            if(registeredServer.getServerInfo().getName().equals("limbo")) {
+                ChildServerConfig config = VelocityRouter.getConfiguration().childServerFromName(event.getServer().getServerInfo().getName());
                 VelocityRouter.getServerManager().cancelStopTimer(config);
                 VelocityRouter.getProxyServer().getAllPlayers().forEach(player -> {
                     player.sendMessage(Component.text(event.getPlayer().getUsername() + " has connected to %s.".formatted(config.displayName())).color(NamedTextColor.YELLOW).decorate(TextDecoration.ITALIC));
