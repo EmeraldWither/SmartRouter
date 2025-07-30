@@ -42,7 +42,7 @@ public class PlayerConnectionEvents {
         lastServer.put(event.getPlayer(), event.getServer());
         if(event.getPreviousServer().isPresent()) {
             RegisteredServer registeredServer = event.getPreviousServer().get();
-            if(registeredServer.getServerInfo().getName().equals("limbo")) {
+            if(!registeredServer.getServerInfo().getName().equals("limbo")) {
                 ChildServerConfig config = VelocityRouter.getConfiguration().childServerFromName(registeredServer.getServerInfo().getName());
                 VelocityRouter.getServerManager().cancelStopTimer(config);
                 VelocityRouter.getProxyServer().getAllPlayers().forEach(player -> {
@@ -66,12 +66,5 @@ public class PlayerConnectionEvents {
             });
             return;
         }
-
-
-
-
-
-
-
     }
 }
