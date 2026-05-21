@@ -4,10 +4,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.emeraldcraft.paperrouter.serverapi.components.ChildServerConfig;
-import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.ec2.Ec2Client;
 
+import javax.swing.plaf.synth.Region;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,6 @@ public class Configuration {
     private ChildServerConfig selectedServer;
     private String pteroPanelURL;
     private String pteroAPIKey;
-    private Ec2Client ec2Client;
     private final List<String> allowList = new ArrayList<>();
 
     public Configuration(FileConfiguration config) {
@@ -48,8 +45,7 @@ public class Configuration {
             String displayName = configurationSection.getString("display_name");
             String pteroServerId = configurationSection.getString("ptero_server_id");
             boolean autoStart = configurationSection.getBoolean("auto_start");
-            String awsInstanceId = config.getString("aws_instance_id");
-            ChildServerConfig childServerConfig = new ChildServerConfig(serverName, Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), Objects.requireNonNull(awsInstanceId), autoStart);
+            ChildServerConfig childServerConfig = new ChildServerConfig(serverName, Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), autoStart);
             configuredChildServerConfigs.add(childServerConfig);
         }
 
@@ -83,9 +79,6 @@ public class Configuration {
         //grab the ptero panel url
         pteroPanelURL = config.getString("ptero_panel_url");
         pteroAPIKey = config.getString("ptero_api_key");
-
-        this.ec2Client = Ec2Client.builder().credentialsProvider(InstanceProfileCredentialsProvider.builder().build()).region(Region.US_EAST_2).build();
-        this.ec2Client.describeInstanceStatus();
 
         PaperRouter.logger().info("Successfully loaded configuration");
 
@@ -144,10 +137,6 @@ public class Configuration {
 
     public String getPteroAPIKey() {
         return pteroAPIKey;
-    }
-
-    public Ec2Client getEc2Client() {
-        return ec2Client;
     }
 
     public void setMaintenance(boolean value) {

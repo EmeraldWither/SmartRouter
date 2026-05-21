@@ -4,9 +4,6 @@ import org.emeraldcraft.velocityRouter.VelocityRouter;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
-import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.ec2.Ec2Client;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +23,6 @@ public class Configuration {
     private ChildServerConfig selectedServer;
     private String pteroPanelURL;
     private String pteroAPIKey;
-    private Ec2Client ec2Client;
     private final List<String> allowList = new ArrayList<>();
 
     public Configuration(Path path) {
@@ -50,8 +46,7 @@ public class Configuration {
             String displayName = node.node("display_name").getString();
             String pteroServerId = node.node("ptero_server_id").getString();
             boolean autoStart = node.node("auto_start").getBoolean();
-            String awsInstanceId = root.node("aws_instance_id").getString();
-            ChildServerConfig childServerConfig = new ChildServerConfig(serverName.toString(), Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), Objects.requireNonNull(awsInstanceId), autoStart);
+            ChildServerConfig childServerConfig = new ChildServerConfig(serverName.toString(), Objects.requireNonNull(displayName), Objects.requireNonNull(pteroServerId), autoStart);
             configuredChildServerConfigs.add(childServerConfig);
         });
 
@@ -80,9 +75,6 @@ public class Configuration {
         //grab the ptero panel url
         pteroPanelURL = root.node("ptero_panel_url").getString();
         pteroAPIKey = root.node("ptero_api_key").getString();
-
-        this.ec2Client = Ec2Client.builder().credentialsProvider(InstanceProfileCredentialsProvider.builder().build()).region(Region.US_EAST_2).build();
-        this.ec2Client.describeInstanceStatus();
 
         VelocityRouter.getLogger().info("Successfully loaded configuration");
 
@@ -166,9 +158,6 @@ public class Configuration {
         return pteroAPIKey;
     }
 
-    public Ec2Client getEc2Client() {
-        return ec2Client;
-    }
 
     public void setMaintenance(boolean value) {
         this.maintenance = value;

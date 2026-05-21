@@ -16,7 +16,6 @@ import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.emeraldcraft.velocityRouter.serverapi.InstanceManager;
 import org.emeraldcraft.velocityRouter.serverapi.components.Configuration;
 import org.emeraldcraft.velocityRouter.serverapi.components.ServerManager;
 import org.slf4j.Logger;
@@ -39,7 +38,6 @@ public class VelocityRouter {
     private static VelocityRouter instance;
     private Configuration configuration;
     private ServerManager manager;
-    private InstanceManager instanceManager;
 
     @DataDirectory
     @Inject
@@ -52,7 +50,6 @@ public class VelocityRouter {
         configuration = new Configuration(dataDirectory);
         configuration.load();
         manager = new ServerManager(configuration);
-        instanceManager = new InstanceManager();
         getProxyServer().getEventManager().register(this, new PlayerConnectionEvents());
 
         CommandMeta lobby = getProxyServer().getCommandManager().metaBuilder("lobby").plugin(this).build();
@@ -100,10 +97,6 @@ public class VelocityRouter {
 
     public static ServerManager getServerManager() {
         return instance.manager;
-    }
-
-    public static InstanceManager getInstanceManager() {
-        return  instance.instanceManager;
     }
 
 

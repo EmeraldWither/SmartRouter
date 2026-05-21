@@ -8,9 +8,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.emeraldcraft.paperrouter.Configuration;
 import org.emeraldcraft.paperrouter.PaperRouter;
 import org.emeraldcraft.paperrouter.serverapi.components.ChildServerConfig;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.StartInstancesRequest;
-import software.amazon.awssdk.services.ec2.model.StopInstancesRequest;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import static org.emeraldcraft.paperrouter.serverapi.pterodaytcl.Pterodactyl.getInstanceState;
 import static org.emeraldcraft.paperrouter.serverapi.pterodaytcl.Pterodactyl.getResponse;
 
 
@@ -44,52 +40,34 @@ public class ChildServer {
     public void fetchNow() {
         lastFetchTime = System.currentTimeMillis();
         Configuration configuration = PaperRouter.getConfiguration();
-        String currentAWSState = getInstanceState(childServerConfig, PaperRouter.getConfiguration());
-        if(currentAWSState.equals("stopped")) {
-            serverState = ServerState.INSTANCE_STOPPED;
-        }
-        else if(currentAWSState.equals("pending")) {
+        String serverInfo = getResponse(configuration.getPteroPanelURL(), childServerConfig.pteroServerID(), configuration.getPteroAPIKey());
+        if (serverInfo.contains("\"detail\": \"Could not establish a connection to the machine running this server. Please try again.\"")) {
+            PaperRouter.logger().info("Pterodactyl cannot communicate with instance, so %s offline.".formatted(childServerConfig.displayName()));
             serverState = ServerState.SERVER_UNREACHABLE;
-        }
-        else if(currentAWSState.equals("stopping")) {
-            serverState = ServerState.INSTANCE_STOPPING;
-        }
-        else if(currentAWSState.equals("running")) {
-
-            String serverInfo = getResponse(configuration.getPteroPanelURL(), childServerConfig.pteroServerID(), configuration.getPteroAPIKey());
-            if (serverInfo.contains("\"detail\": \"Could not establish a connection to the machine running this server. Please try again.\"")) {
-                PaperRouter.logger().info("Pterodactyl cannot communicate with instance, so %s offline.".formatted(childServerConfig.displayName()));
-                serverState = ServerState.SERVER_UNREACHABLE;
-            } else if (serverInfo.startsWith("<!DOCTYPE html>")) {
-                serverState = ServerState.SERVER_UNREACHABLE;
-            } else {
-                JsonObject json = (new Gson()).fromJson(serverInfo, JsonObject.class);
-                String state = json.getAsJsonObject("attributes").get("current_state").getAsString();
-                if (state.equalsIgnoreCase("starting")) {
-                    PaperRouter.logger().info("Pterodactyl says %s is starting.".formatted(childServerConfig.displayName()));
-                    serverState =  ServerState.SERVER_STARTING;
-                } else if (state.equalsIgnoreCase("running")) {
-                    PaperRouter.logger().info("Ptero says %s is running.".formatted(childServerConfig.displayName()));
-                    starting = false;
-                    serverState =  ServerState.SERVER_ONLINE;
-                } else if (state.equalsIgnoreCase("stopping")) {
-                    PaperRouter.logger().info("Ptero says stopping %s.".formatted(childServerConfig.displayName()));
-                    serverState =  ServerState.SERVER_STOPPING;
-                }
-                else if (state.equalsIgnoreCase("offline")) {
-                    PaperRouter.logger().info("Ptero says offline %s.".formatted(childServerConfig.displayName()));
-                    serverState =  ServerState.SERVER_OFFLINE;
-                }
-                else {
-                    PaperRouter.logger().warning("Server State Failed: " + serverInfo);
-                }
+        } else if (serverInfo.startsWith("<!DOCTYPE html>")) {
+            serverState = ServerState.SERVER_UNREACHABLE;
+        } else {
+            JsonObject json = (new Gson()).fromJson(serverInfo, JsonObject.class);
+            String state = json.getAsJsonObject("attributes").get("current_state").getAsString();
+            if (state.equalsIgnoreCase("starting")) {
+                PaperRouter.logger().info("Pterodactyl says %s is starting.".formatted(childServerConfig.displayName()));
+                serverState =  ServerState.SERVER_STARTING;
+            } else if (state.equalsIgnoreCase("running")) {
+                PaperRouter.logger().info("Ptero says %s is running.".formatted(childServerConfig.displayName()));
+                starting = false;
+                serverState =  ServerState.SERVER_ONLINE;
+            } else if (state.equalsIgnoreCase("stopping")) {
+                PaperRouter.logger().info("Ptero says stopping %s.".formatted(childServerConfig.displayName()));
+                serverState =  ServerState.SERVER_STOPPING;
+            }
+            else if (state.equalsIgnoreCase("offline")) {
+                PaperRouter.logger().info("Ptero says offline %s.".formatted(childServerConfig.displayName()));
+                serverState =  ServerState.SERVER_OFFLINE;
+            }
+            else {
+                PaperRouter.logger().warning("Server State Failed: " + serverInfo);
             }
 
-
-        }
-        else {
-            PaperRouter.logger().severe("Unable to determine instance state for %s (The instance state was %s)".formatted(childServerConfig, currentAWSState));
-            serverState = ServerState.UNKNOWN;
         }
 
 
@@ -122,14 +100,7 @@ public class ChildServer {
             PaperRouter.logger().severe("Tried to start server, but failed because we have an unknown state...");
             return StartResponse.ERROR_ADMIN;
         }
-        if(serverState == ServerState.INSTANCE_STOPPED) {
-            //start AWS
-            starting = true;
-            startAWSInstance();
-            runPteroStartTask();
-            return StartResponse.SUCCESS;
-
-        } else if (serverState == ServerState.SERVER_OFFLINE) {
+        else if (serverState == ServerState.SERVER_OFFLINE) {
             if(startTask == null) {
                 starting = true;
                 System.out.println("Running ptero start task");
@@ -162,9 +133,6 @@ public class ChildServer {
         if(serverState == ServerState.SERVER_ONLINE) {
             sendPteroPowerCommand(childServerConfig, PaperRouter.getConfiguration(), "stop");
             runPteroStopTask();
-        }
-        if(serverState == ServerState.SERVER_OFFLINE) {
-            stopAWSInstance();
         }
     }
 
@@ -199,17 +167,6 @@ public class ChildServer {
     private void runPteroStopTask() {
         sendPteroPowerCommand(childServerConfig, PaperRouter.getConfiguration(), "stop");
         PaperRouter.logger().info("Sent Pterodactyl stop command to '%s', waiting 20s before sending instance shutdown...".formatted(childServerConfig.displayName()));
-        instanceStopTask = Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(PaperRouter.class), this::stopAWSInstance, 20 * 20);
-    }
-
-    private void startAWSInstance() {
-        Ec2Client ec2Client = PaperRouter.getConfiguration().getEc2Client();
-        ec2Client.startInstances(StartInstancesRequest.builder().instanceIds(childServerConfig.awsInstanceID()).build());
-    }
-    private void stopAWSInstance() {
-        PaperRouter.logger().info("Shutting down instance %s.".formatted(childServerConfig.awsInstanceID()));
-        Ec2Client ec2Client = PaperRouter.getConfiguration().getEc2Client();
-        ec2Client.stopInstances(StopInstancesRequest.builder().instanceIds(childServerConfig.awsInstanceID()).build());
     }
 
     public void cancelStopTimer() {

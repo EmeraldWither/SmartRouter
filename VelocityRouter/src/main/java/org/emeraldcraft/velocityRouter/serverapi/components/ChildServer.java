@@ -4,10 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import org.emeraldcraft.velocityRouter.VelocityRouter;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.StartInstancesRequest;
-import software.amazon.awssdk.services.ec2.model.StopInstancesRequest;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -16,7 +12,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-import static org.emeraldcraft.velocityRouter.serverapi.pterodaytcl.Pterodactyl.getInstanceState;
 import static org.emeraldcraft.velocityRouter.serverapi.pterodaytcl.Pterodactyl.getResponse;
 
 
@@ -26,7 +21,6 @@ public class ChildServer {
     private ServerState serverState = ServerState.UNKNOWN;
     private ScheduledTask startTask;
     private ScheduledTask pteroStopTask;
-    private ScheduledTask instanceStopTask;
 
 
     public ChildServer(ChildServerConfig childServerConfig) {
@@ -35,51 +29,32 @@ public class ChildServer {
 
     public void fetchData() {
         Configuration configuration = VelocityRouter.getConfiguration();
-        String currentAWSState = getInstanceState(childServerConfig, VelocityRouter.getConfiguration());
-        if(currentAWSState.equals("stopped")) {
-            serverState = ServerState.INSTANCE_STOPPED;
-        }
-        else if(currentAWSState.equals("pending")) {
+        String serverInfo = getResponse(configuration.getPteroPanelURL(), childServerConfig.pteroServerID(), configuration.getPteroAPIKey());
+        if (serverInfo.contains("\"detail\": \"Could not establish a connection to the machine running this server. Please try again.\"")) {
+            VelocityRouter.getLogger().info("Pterodactyl cannot communicate with instance, so %s offline.".formatted(childServerConfig.displayName()));
             serverState = ServerState.SERVER_UNREACHABLE;
-        }
-        else if(currentAWSState.equals("stopping")) {
-            serverState = ServerState.INSTANCE_STOPPING;
-        }
-        else if(currentAWSState.equals("running")) {
-
-            String serverInfo = getResponse(configuration.getPteroPanelURL(), childServerConfig.pteroServerID(), configuration.getPteroAPIKey());
-            if (serverInfo.contains("\"detail\": \"Could not establish a connection to the machine running this server. Please try again.\"")) {
-                VelocityRouter.getLogger().info("Pterodactyl cannot communicate with instance, so %s offline.".formatted(childServerConfig.displayName()));
-                serverState = ServerState.SERVER_UNREACHABLE;
-            } else if (serverInfo.startsWith("<!DOCTYPE html>")) {
-                serverState = ServerState.SERVER_UNREACHABLE;
-            } else {
-                JsonObject json = (new Gson()).fromJson(serverInfo, JsonObject.class);
-                String state = json.getAsJsonObject("attributes").get("current_state").getAsString();
-                if (state.equalsIgnoreCase("starting")) {
-                    VelocityRouter.getLogger().info("Pterodactyl says %s is starting.".formatted(childServerConfig.displayName()));
-                    serverState =  ServerState.SERVER_STARTING;
-                } else if (state.equalsIgnoreCase("running")) {
-                    VelocityRouter.getLogger().info("Ptero says %s is running.".formatted(childServerConfig.displayName()));
-                    serverState =  ServerState.SERVER_ONLINE;
-                } else if (state.equalsIgnoreCase("stopping")) {
-                    VelocityRouter.getLogger().info("Ptero says stopping %s.".formatted(childServerConfig.displayName()));
-                    serverState =  ServerState.SERVER_STOPPING;
-                }
-                else if (state.equalsIgnoreCase("offline")) {
-                    VelocityRouter.getLogger().info("Ptero says offline %s.".formatted(childServerConfig.displayName()));
-                    serverState =  ServerState.SERVER_OFFLINE;
-                }
-                else {
-                    VelocityRouter.getLogger().warn("Server State Failed: " + serverInfo);
-                }
+        } else if (serverInfo.startsWith("<!DOCTYPE html>")) {
+            serverState = ServerState.SERVER_UNREACHABLE;
+        } else {
+            JsonObject json = (new Gson()).fromJson(serverInfo, JsonObject.class);
+            String state = json.getAsJsonObject("attributes").get("current_state").getAsString();
+            if (state.equalsIgnoreCase("starting")) {
+                VelocityRouter.getLogger().info("Pterodactyl says %s is starting.".formatted(childServerConfig.displayName()));
+                serverState =  ServerState.SERVER_STARTING;
+            } else if (state.equalsIgnoreCase("running")) {
+                VelocityRouter.getLogger().info("Ptero says %s is running.".formatted(childServerConfig.displayName()));
+                serverState =  ServerState.SERVER_ONLINE;
+            } else if (state.equalsIgnoreCase("stopping")) {
+                VelocityRouter.getLogger().info("Ptero says stopping %s.".formatted(childServerConfig.displayName()));
+                serverState =  ServerState.SERVER_STOPPING;
             }
-
-
-        }
-        else {
-            VelocityRouter.getLogger().error("Unable to determine instance state for %s (The instance state was %s)".formatted(childServerConfig, currentAWSState));
-            serverState = ServerState.UNKNOWN;
+            else if (state.equalsIgnoreCase("offline")) {
+                VelocityRouter.getLogger().info("Ptero says offline %s.".formatted(childServerConfig.displayName()));
+                serverState =  ServerState.SERVER_OFFLINE;
+            }
+            else {
+                VelocityRouter.getLogger().warn("Server State Failed: " + serverInfo);
+            }
         }
 
 
@@ -90,18 +65,8 @@ public class ChildServer {
         return childServerConfig;
     }
 
-    public ServerState getServerState() {
-        return serverState;
-    }
-
-
 
     public StartResponse start() {
-        //first verify instance state
-        if(instanceStopTask != null) {
-            instanceStopTask.cancel();
-            instanceStopTask = null;
-        }
         if(pteroStopTask != null) {
             pteroStopTask.cancel();
             pteroStopTask = null;
@@ -112,13 +77,7 @@ public class ChildServer {
             VelocityRouter.getLogger().error("Tried to start server, but failed because we have an unknown state...");
             return StartResponse.ERROR_ADMIN;
         }
-        if(serverState == ServerState.INSTANCE_STOPPED) {
-            //start AWS
-            startAWSInstance();
-            runPteroStartTask();
-            return StartResponse.SUCCESS;
-
-        } else if (serverState == ServerState.SERVER_OFFLINE) {
+        else if (serverState == ServerState.SERVER_OFFLINE) {
             if(startTask == null) {
                 runPteroStartTask();
             }
@@ -147,9 +106,6 @@ public class ChildServer {
         if(serverState == ServerState.SERVER_ONLINE) {
             sendPteroPowerCommand(childServerConfig, VelocityRouter.getConfiguration(), "stop");
             runPteroStopTask();
-        }
-        if(serverState == ServerState.SERVER_OFFLINE) {
-            stopAWSInstance();
         }
     }
 
@@ -183,22 +139,13 @@ public class ChildServer {
     private void runPteroStopTask() {
         sendPteroPowerCommand(childServerConfig, VelocityRouter.getConfiguration(), "stop");
         VelocityRouter.getLogger().info("Sent Pterodactyl stop command to '%s', waiting 30s before sending instance shutdown...".formatted(childServerConfig.displayName()));
-        instanceStopTask = VelocityRouter.getProxyServer().getScheduler().buildTask(VelocityRouter.getInstance(), this::stopAWSInstance).delay(Duration.ofSeconds(30)).schedule();
     }
 
-    private void startAWSInstance() {
-        Ec2Client ec2Client = VelocityRouter.getConfiguration().getEc2Client();
-        ec2Client.startInstances(StartInstancesRequest.builder().instanceIds(childServerConfig.awsInstanceID()).build());
-    }
-    private void stopAWSInstance() {
-        VelocityRouter.getInstanceManager().stopInstance();
-    }
+
 
     public void cancelStopTimer() {
         if(pteroStopTask != null) pteroStopTask.cancel();
-        if(instanceStopTask != null) instanceStopTask.cancel();
         pteroStopTask = null;
-        instanceStopTask = null;
         VelocityRouter.getLogger().info("Stopped the stop timer for %s".formatted(childServerConfig.displayName()));
     }
 

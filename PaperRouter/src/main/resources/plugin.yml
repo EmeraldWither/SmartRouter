@@ -1,4 +1,4 @@
 name: PaperRouter
-version: '3.0-beta-1'
+version: '3.1'
 main: org.emeraldcraft.paperrouter.PaperRouter
 api-version: '1.21'

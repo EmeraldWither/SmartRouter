@@ -6,10 +6,6 @@ import com.velocitypowered.api.scheduler.ScheduledTask;
 import org.emeraldcraft.velocityRouter.VelocityRouter;
 import org.emeraldcraft.velocityRouter.serverapi.components.ChildServerConfig;
 import org.emeraldcraft.velocityRouter.serverapi.components.Configuration;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusRequest;
-import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusResponse;
-import software.amazon.awssdk.services.ec2.model.StartInstancesRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,11 +27,6 @@ public class Pterodactyl {
             return;
         }
         stopAllTimers();
-        String instanceState = getInstanceState(server, configuration);
-        if (instanceState.equalsIgnoreCase("stopped")) {
-            Ec2Client ec2Client = configuration.getEc2Client();
-            ec2Client.startInstances(StartInstancesRequest.builder().instanceIds(server.awsInstanceID()).build());
-        }
     }
 //    public static void stopServer(ChildServerConfig server, Configuration configuration) {
 //        try {
@@ -111,22 +102,12 @@ public class Pterodactyl {
     }
 
     public static String getServerState(ChildServerConfig server, Configuration configuration) {
-        String currentStatus = getInstanceState(server, configuration);
-        if (!currentStatus.equalsIgnoreCase("running")) {
-            VelocityRouter.getLogger().info("Current EC2 Instance State: " + currentStatus);
-            return currentStatus;
-        } else if (!Pterodactyl.isServerOnline(server, configuration)) {
+        if (!Pterodactyl.isServerOnline(server, configuration)) {
             VelocityRouter.getLogger().info("Ptero Says not Online");
             return "starting";
         } else {
             return "online";
         }
-    }
-
-    public static String getInstanceState(ChildServerConfig server, Configuration configuration) {
-        Ec2Client ec2Client = configuration.getEc2Client();
-        DescribeInstanceStatusResponse response = ec2Client.describeInstanceStatus(DescribeInstanceStatusRequest.builder().instanceIds(server.awsInstanceID()).includeAllInstances(true).build());
-        return response.instanceStatuses().get(0).instanceState().nameAsString();
     }
     public static String getResponse(String panelURL, String serverID, String apiKey) {
         try {

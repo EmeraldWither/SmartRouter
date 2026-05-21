@@ -8,11 +8,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.emeraldcraft.paperrouter.Configuration;
 import org.emeraldcraft.paperrouter.PaperRouter;
 import org.emeraldcraft.paperrouter.serverapi.components.ChildServerConfig;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusRequest;
-import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusResponse;
-import software.amazon.awssdk.services.ec2.model.StartInstancesRequest;
-import software.amazon.awssdk.services.ec2.model.StopInstancesRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +24,6 @@ import java.util.Scanner;
 
 @Deprecated
 public class Pterodactyl {
-    private static final HashMap<ChildServerConfig, BukkitTask> instanceStopTimers = new HashMap<>();
     private static BukkitTask pteroStopTimer;
     public static void startServer(ChildServerConfig server, Configuration configuration) {
         if(getServerState(server, configuration).equals("stopping")) {
@@ -37,11 +31,6 @@ public class Pterodactyl {
             return;
         }
         stopAllTimers();
-        String instanceState = getInstanceState(server, configuration);
-        if (instanceState.equalsIgnoreCase("stopped")) {
-            Ec2Client ec2Client = configuration.getEc2Client();
-            ec2Client.startInstances(StartInstancesRequest.builder().instanceIds(server.awsInstanceID()).build());
-        }
     }
     public static void stopServer(ChildServerConfig server, Configuration configuration) {
         try {
@@ -73,15 +62,6 @@ public class Pterodactyl {
         } catch (IOException var8) {
             var8.printStackTrace();
         }
-        if (instanceStopTimers.get(server) != null) {
-            instanceStopTimers.get(server).cancel();
-        }
-        BukkitTask task = Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(PaperRouter.class), () -> {
-            PaperRouter.logger().info("30 seconds has passed. Stopping instance %s for server %s.".formatted(server.awsInstanceID(), server.displayName()));
-            Ec2Client ec2Client = configuration.getEc2Client();
-            ec2Client.stopInstances(StopInstancesRequest.builder().instanceIds(server.awsInstanceID()).build());
-        }, 30 * 20);
-        instanceStopTimers.put(server, task);
     }
 
     public static boolean isServerOnline(ChildServerConfig server, Configuration configuration) {
@@ -117,22 +97,12 @@ public class Pterodactyl {
     }
 
     public static String getServerState(ChildServerConfig server, Configuration configuration) {
-        String currentStatus = getInstanceState(server, configuration);
-        if (!currentStatus.equalsIgnoreCase("running")) {
-            PaperRouter.logger().info("Current EC2 Instance State: " + currentStatus);
-            return currentStatus;
-        } else if (!Pterodactyl.isServerOnline(server, configuration)) {
+        if (!Pterodactyl.isServerOnline(server, configuration)) {
             PaperRouter.logger().info("Ptero Says not Online");
             return "starting";
         } else {
             return "online";
         }
-    }
-
-    public static String getInstanceState(ChildServerConfig server, Configuration configuration) {
-        Ec2Client ec2Client = configuration.getEc2Client();
-        DescribeInstanceStatusResponse response = ec2Client.describeInstanceStatus(DescribeInstanceStatusRequest.builder().instanceIds(server.awsInstanceID()).includeAllInstances(true).build());
-        return response.instanceStatuses().get(0).instanceState().nameAsString();
     }
     public static String getResponse(String panelURL, String serverID, String apiKey) {
         try {
@@ -178,15 +148,6 @@ public class Pterodactyl {
     }
 
     public static void stopAllTimers() {
-        List<ChildServerConfig> removedServers = new ArrayList<>();
-        for(ChildServerConfig server : instanceStopTimers.keySet()) {
-            if(server == null) continue;
-            if(instanceStopTimers.get(server) != null) {
-                instanceStopTimers.get(server).cancel();
-                removedServers.add(server);
-            }
-        }
-        removedServers.forEach(instanceStopTimers::remove);
         if(pteroStopTimer != null) {
             pteroStopTimer.cancel();
         }
